@@ -14,7 +14,7 @@
 **2.** Go to the Eris-main folder where you will find the files to run the prototype
 
    - Change the database information in the  'config.txt' file according to your database
-   - Double click 'run.bat' file  and the prototype screen will be shown
+   - Double click 'run.bat' file  and the prototype screen will be shown. Before running this file, please edit the Python interpreter name that you are using
    - Select the options that you want to try and click the LOAD button and wait until loading is completed
    - In tab 2, you will get the option to select a ground truth but if you see there is only one option under one table, do not select any, leave it as it is otherwise you can check and update the schema
    - In tab 3, you can give the queries as input or choose the query file from your directory and click the RUN button. Make Sure you copy the spec file of the queries in the Eris-main folder
