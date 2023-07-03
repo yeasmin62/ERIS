@@ -1,0 +1,4 @@
+localhost
+Sample
+postgres
+31766
