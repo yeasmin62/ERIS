@@ -1,6 +1,7 @@
  ## Running the Prototype
 
 **1.** Go to the DataLoading folder where you will find the files to load data into your database
+   - Please Download and Paste the Datasets into the *Data* Folder from here: `https://drive.google.com/drive/folders/1R6opY3qY9k1ZMxYXmhf4yUywoLsxbuDM?usp=sharing`
    - Change the database information in the  'config.txt' file according to your database
    - Run 'create-tables.py'
    - Run 'constraintsOfDimensions.py'
