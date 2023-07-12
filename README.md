@@ -1,3 +1,12 @@
+## Installation Requirements
+
+**1.** Install Scala version 2.13.10 [(https://www.scala-lang.org/download/2.13.10.html)]  
+**2.** Install sbt version 1.8.3 [(https://www.scala-sbt.org/download.html)]  
+**3.** Install python version 3.9.16 or more  
+**4.** Install PostgreSQL 14 or more  
+**5.** Install pgAdmin 4 or more  
+**6.** Install JVM 11
+ 
  ## Running the Prototype
 
 **1.** Go to the DataLoading folder where you will find the files to load data into your database
@@ -9,7 +18,7 @@
    - Run 'load-dimensions.py'
    - Run 'LoadClimateFactTable.py', 'LoadCopernicusFactTable.py', 'LoadModisAquaFactTable.py', 'LoadPathFinderFactTable.py'  
 
-**N.B:** Make sure that your python interpreter has netCDF4, psycopg2, OSQP libraries intalled
+**N.B:** Make sure that your python interpreter has netCDF4, psycopg2, OSQP. numpy, scipy, progressbar, pandas libraries installed
 
 **2.** Go to the Eris-main folder where you will find the files to run the prototype
 
