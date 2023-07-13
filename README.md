@@ -14,7 +14,7 @@
    - Change the database information in the  'config.txt' file according to your database
    - Create a Python environment using the command:    `conda create --name myenv python = version`
    - Install all the required packages using the command: `pip install -r requirements.txt`
-   - Double click *run.bat* file and wait for data to be loaded into the database
+   - Double click *run.bat* file and wait for data to be loaded into the database. Change the python environment name before running
 
 
 **2.** Go to the Eris-main folder where you will find the files to run the prototype
