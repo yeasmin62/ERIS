@@ -119,19 +119,19 @@ object GuiNew extends JFXApp {
     val rbn_s_error = new RadioButton("Average Square Error (ASE)") {
       onAction = (e: ActionEvent) => {
         flag_error = "ASE"
-        // print(flag_error)
+        print(flag_error)
       }
     }
     val rbn_a_error = new RadioButton("Average Absolute Error (AAE)") {
       onAction = (e: ActionEvent) => {
         flag_error = "AAE"
-        // print(flag_error)
+        print(flag_error)
       }
     }
     val rbn_value_interval = new RadioButton("Error with Variable Constraints"){
       onAction = (e: ActionEvent) => {
         flag_error = "Value_Interval"
-        // print(flag_error)
+        print(flag_error)
       }
     }
     val toggol4 = new ToggleGroup
@@ -514,7 +514,7 @@ object GuiNew extends JFXApp {
     val tab4lbl1 = new Label("In your query you can apply this operations: Select (U+03c3), Project (π), ProjectAway (π), Join (⨝), Renaming (U+03C1), Difference ('\'), Aggregation (U+03b3)," +
 "UNION (∪), DUNION  (⊎), Coalescing (к) \n")
 
-    // tab4vbox.children = List(tab4lbl, tab4lbl1)
+    tab4vbox.children = List(tab4lbl, tab4lbl1)
 
     val rbn6 = new Button("EXIT") {
       layoutX = 260

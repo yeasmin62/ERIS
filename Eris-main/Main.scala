@@ -7,18 +7,17 @@ object Main {
     val connector = Connector(args(0), args(1), args(2), args(3))
    var input_text = """
 
-   
 t1:=(climate_temperature);
 t2:=(t1 JOIN semiday{id->date});
-t3:=(t2(dateofsemiday = '20200101'));
+t3:=(t2(dateofsemiday = '20200131'));
 t4:=((t3{counter:=1})[dateofsemiday,latitude,longitude SUM sea_surface_temperature,counter]);
 t5:=((t4{sst:=sea_surface_temperature/counter}){latitude->degree005});
 t6:=((t5 JOIN resolution005){degree005->la});
 t7:=(((t6{degree020->latitude}){longitude->degree005}) JOIN resolution005{degree020->longitude});
 t8:=((t7{counter1:=1})[latitude,longitude SUM sst, counter1]);
 t9:=(t8{avg_sst:= sst/counter1})[avg_sst];
-t10:=(copernicus_temperature{date->dateofsemiday});
-t11:=(t10(dateofsemiday='20200101'));
+t10:=(copernicus_temperature{date->dateofsemiday} JOIN semiday);
+t11:=(t10(dateofsemiday='20200131'));
 t12:=((t11{latitude->degree005}) JOIN resolution005);
 t13:=((t12{degree005->la}){degree020->latitude});
 t14:=((t13{longitude->degree005}) JOIN (resolution005{degree020->longitude}));
@@ -67,7 +66,7 @@ t17:=(t9 DUNION[src] t16)[COAL src]
           q0 = iq0
           q0vc = iq0vc
           enc_schema = EncodeNF2_SparseV.instanceSchemaEncoding(ctx)
-          print(q0)
+          // print(q0)
 
 
         }
@@ -104,6 +103,8 @@ t17:=(t9 DUNION[src] t16)[COAL src]
         val result0vc = getQuery(q0vc)
         println(result0vc)
         println("========")
+        val (valuation,objective,eqs,vars,eqCreationTime,solveTime) = VirtualSolverAAE.solve1(connector, q, encoding, false)
+        println(s";$eqs;$vars;"+eqCreationTime+";"+solveTime+";"+objective)
       } catch {
         case Absyn.TypeError(msg) => println("Type error: " + msg)
       }

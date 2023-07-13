@@ -1,0 +1,7 @@
+[0m[[0m[33mwarn[0m] [0m[0mE:\Eris-main\EncodePartitioning.scala:396:11: method without a parameter list overrides a method with a single empty one[0m
+[0m[[0m[33mwarn[0m] [0m[0m      def next = current match {[0m
+[0m[[0m[33mwarn[0m] [0m[0m          ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m10 deprecations (since 2.13.0)[0m
+[0m[[0m[33mwarn[0m] [0m[0m3 deprecations (since 2.13.3)[0m
+[0m[[0m[33mwarn[0m] [0m[0m13 deprecations in total; re-run with -deprecation for details[0m
+[0m[[0m[33mwarn[0m] [0m[0mfour warnings found[0m

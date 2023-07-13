@@ -7,7 +7,7 @@ t6:=((t5 JOIN resolution005){degree005->la});
 t7:=(((t6{degree020->latitude}){longitude->degree005}) JOIN resolution005{degree020->longitude});
 t8:=((t7{counter1:=1})[latitude,longitude SUM sst, counter1]);
 t9:=(t8{avg_sst:= sst/counter1})[avg_sst];
-t10:=(copernicus_temperature{date->dateofsemiday});
+t10:=((copernicus_temperature{date->dateofsemiday}) JOIN semiday);
 t11:=(t10(dateofsemiday='20200101'));
 t12:=((t11{latitude->degree005}) JOIN resolution005);
 t13:=((t12{degree005->la}){degree020->latitude});

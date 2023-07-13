@@ -74,7 +74,7 @@ object  SolveView {
     //   }
 
     val (valuation,objective,eqs,vars,eqCreationTime,solveTime) = result
-    // println(s";$eqs;$vars;"+eqCreationTime+";"+solveTime+";"+objective)
+    println(s";$eqs;$vars;"+eqCreationTime+";"+solveTime+";"+objective)
     (valuation,objective,eqs,vars,eqCreationTime,solveTime)
   }
 
@@ -131,6 +131,7 @@ object  SolveView {
     val eq = encoder.queryEncoding(str)
     val equa = encoder.iterateEncodedConstraints(conn,eq,es)
     val equaList = equa.toList
+    print(equaList)
     equaList
     // val (valuation,objective) = solveList(equations.toList)
     // (valuation, objective)
@@ -199,6 +200,7 @@ object  SolveView {
         vlist = Map("#" + 1-> d, "#" + 2-> d)
 //        vlist = Map("#" + 1-> d)
         view(connector, args(4), encoding, vlist, flag_error, flag_null.toBoolean)
+        
       }
 
 //      view(connector, args(4), encoding, vlist, flag_error, flag_null)

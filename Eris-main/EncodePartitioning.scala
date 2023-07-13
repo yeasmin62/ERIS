@@ -115,24 +115,28 @@ object EncodePartitioning extends Encoding {
 
       case Select(q,p) =>
         val (q0,qm,vc) = queryEncoding(q)
+        // print("Selectqm\n" + qm)
         (Select(q0,p),
           qm.map{case(f,qf) => (f,Select(qf,p))},
           vc)
 
       case ProjectAway(q,fs) =>
         val (q0,qm,vc) = queryEncoding(q)
+        // print("ProjectAwayqm\n" + qm)
         (ProjectAway(q0,fs),
           qm.filterNot{case(f,_) => fs.contains(f)},
           vc)
 
       case Project(q,fs) =>
         val (q0,qm,vc) = queryEncoding(q)
+        // print("Projectqm\n" + qm)
         (Project(q0,fs),
           qm.filter{case(f,_) => fs.contains(f)},
           vc)
 
       case Rename(q,renaming) =>
         val (q0,qm,vc) = queryEncoding(q)
+        // print("Renameqm\n" + qm)
         def find(x: String):String = {
           renaming.find{case(x0,_) => x == x0} match {
             case None => x
@@ -147,6 +151,7 @@ object EncodePartitioning extends Encoding {
       case UnionAll(q1,q2) =>
         val (q10,q1m,vc1) = queryEncoding(q1)
         val (q20,q2m,vc2) = queryEncoding(q2)
+        // print("UnionAllqm\n" + q1m + q2m)
         (UnionAll(q10,q20),
           q1m.map{case (f,qf) => (f,UnionAll(qf,q2m(f)))},
         variableConstraintsUnion(vc1._1,vc1._2,vc2._1,vc2._2)
@@ -155,6 +160,7 @@ object EncodePartitioning extends Encoding {
       case DUnion(q1,q2,attr) =>
         val (q10,q1m,vc1) = queryEncoding(q1)
         val (q20,q2m,vc2) = queryEncoding(q2)
+        // print("DUNIONqm\n" + q1m + q2m)
         (DUnion(q10,q20,attr),
           q1m.map{case (f,qf) => (f,DUnion(qf,q2m(f),attr))},
         variableConstraintsUnion(vc1._1,vc1._2,vc2._1,vc2._2)
@@ -162,6 +168,7 @@ object EncodePartitioning extends Encoding {
 
       case Derivation(q,List((f,Num(c)))) =>
         val (q0,qm,vc) = queryEncoding(q)
+        // print("Derivation1qm\n" + qm)
         val q_empty = Emptyset
         q_empty.schema = fieldSchema(q.schema)
         (Derivation(q0,List((f,Num(c)))),
@@ -170,6 +177,7 @@ object EncodePartitioning extends Encoding {
 
       case Derivation(q,List((f,Plus(Var(a),Var(b))))) =>
         val (q0,qm,vc) = queryEncoding(q)
+        // print("DerivationABqm\n" + qm)
         val schema = fieldSchema(q.schema)
         // TODO: this can lead to exponential blowup...
         (Derivation(q0,List((f,Plus(Var(a),Var(b))))),
@@ -179,9 +187,25 @@ object EncodePartitioning extends Encoding {
                 UnionAll(qm(a),qm(b)),
                 schema.keyFields.toList,schema.valFields.toList))),
           vc)
+      case Derivation(q,List((f,Plus(Var(a),Num(c))))) =>
+        
+        val (q0,qm,vc) = queryEncoding(q)
+        // print("DerivationACqm\n" + qm)
+        val q_empty = Emptyset
+        q_empty.schema = fieldSchema(q.schema)
+        // print("schema" + schema)
+        if(q.schema.varfreeFields.contains(a)){
+          (Derivation(q0,List((f,Plus(Var(a),Num(c))))),qm + {f->Emptyset},vc)
+        }
+        else {
+          (Derivation(q0,List((f,Plus(Var(a),Num(c))))),qm + {f-> q_empty} ,vc)
+
+        }
+        
 
       case Derivation(q,List((b,Var(a)))) =>
         val (q0,qm,vc) = queryEncoding(q)
+        print("DerivationBAqm\n" + qm)
         (Derivation(q0,List((b,Var(a)))),
           qm + (b -> qm(a)),
           vc)
