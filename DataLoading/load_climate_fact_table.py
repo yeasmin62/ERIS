@@ -1,107 +1,106 @@
+from multiprocessing import Pool
 import os
-import os.path
-from os import path
-from traceback import print_tb
 import netCDF4 as nc4
 import numpy as np
-from progressbar import ProgressBar
 import pandas as pd
-import csv
 from datetime import datetime, timedelta
 from netCDF4 import num2date
 from stringclass import stringClass
-import psycopg2
+from sqlalchemy import create_engine, text
+from time import time
 
-def load_climate(conn, cursor):
-######################## DATA ##########################################
+def date_info(date):
+    if(len(str(date))) < 2:
+        return '0' + str(date)
+    else:
+        return str(date)
 
+def process_file(args):
+    file, path_cd, index_cd, points, dict, connection_string = args
+    df_cd = nc4.Dataset(os.path.join(path_cd, file))
+    name = file
+    cd_actual = df_cd['sea_surface_temperature'][:,:]
+    times = df_cd.variables['time'][:]
+    units = df_cd.variables['time'].units
+    t = num2date(times, units=units, calendar='365_day')
+    t -= timedelta(days=9)
+    c = str(t[0].year) + date_info(t[0].month) + date_info(t[0].day)
+    if 'night' in str(name):
+        d = c + 'N'
+    elif 'day' in str(name):
+        d = c + 'D'
+
+    data_list = []
+    for pos, p in zip(index_cd, points):
+        c1 = int(p[0] * 100)
+        k1 = c1 - c1 % 5
+        c2 = int(p[1] * 100)
+        k2 = c2 - c2 % 5
+        if not cd_actual.mask[0][pos[0], pos[1]]:
+            data = cd_actual[0][pos[0], pos[1]].astype(float)
+            data_list.append({'date': d, 'latitude': dict[k1], 'longitude': dict[k2],
+                              'sea_surface_temperature': data})
+
+    data_df = pd.DataFrame(data_list)
+    engine = create_engine(connection_string)
+
+    with engine.connect() as connection:
+        with connection.begin():
+            connection.execute(text("CREATE TEMPORARY TABLE temp_table AS SELECT * FROM climate_temperature WITH NO DATA;"))
+            data_df.to_sql('temp_table', con=connection, if_exists='append', index=False)
+            connection.execute(text("""
+                INSERT INTO climate_temperature (date, latitude, longitude, sea_surface_temperature)
+                SELECT date, latitude, longitude, sea_surface_temperature FROM temp_table
+                ON CONFLICT (date, latitude, longitude) DO NOTHING;
+            """))
+            connection.execute(text(f"DROP TABLE temp_table;"))  # Delete the temporary table
+
+def load_climate(connection_info):
+    start_time = time()
     path_cd = r'Data/climate'
     cd_files = sorted(os.listdir(path_cd))
-    end = len(cd_files)
-
 
     coords_lon = pd.read_csv(r'Dimensioncsv/Degree_0.05.csv')
-    dict={}
-    co_lon = coords_lon['Degree005'][:].to_numpy()
+    dict = {}
+    co_lon = coords_lon['degree005'][:].to_numpy()
     for c in co_lon[:]:
         for i in c:
-            if(i=='~'):
-                lonl = int(float(c[:c.index(i)-1])*100)
-                # print(lonl)
-                if(lonl%5==1):
+            if(i == '~'):
+                lonl = int(float(c[:c.index(i) - 1]) * 100)
+                if(lonl % 5 == 1):
                     lonl = lonl - 1
-                if (lonl%5==4):
-                    lonl=lonl+1
-                dict[lonl]=c
+                if(lonl % 5 == 4):
+                    lonl = lonl + 1
+                dict[lonl] = c
 
     point_lat = pd.read_csv(r'Dimensioncsv/medi_lat.csv')
     point_lon = pd.read_csv(r'Dimensioncsv/medi_lon.csv')
-
-    ############################# INDEX ###################################
     points_lat = point_lat['lat'][:].to_numpy()
     points_lon = point_lon['lon'][:].to_numpy()
-    # print(point_lat,point_lon)
 
     strpro = stringClass()
-    ################################ Date Processing ################################ 
-    def date_info(date):
-        if (len(str(date))) <2:
-            return '0' + str(date)
-        else:
-            return str(date)
 
+    grid_lat, grid_lon = np.meshgrid(points_lat, points_lon)
 
-    points = []
-    for i in points_lat[:]:
-        for j in points_lon[:]:
-            points.append([i,j])
+    # Flatten the grid to get 1D arrays of latitudes and longitudes
+    points_lat_flat = grid_lat.flatten()
+    points_lon_flat = grid_lon.flatten()
+
+    # Create the points array from the flattened latitude and longitude arrays
+    points = np.array([points_lat_flat, points_lon_flat]).T
 
     grid = 0.05
-    index_cd = []
-    for point in points[:]:
-        latitude = point[0]
-        longitude = point[1]
-        ilat = int(abs(np.floor((-90-latitude)/grid)))
-        ilon = int(abs((-180-longitude)/grid))
-        index_cd.append([ilat,ilon])
-    #print(index_cd)
-    for i in range (end):
-        k=[]
-        df_cd = nc4.Dataset(path_cd+'\\'+cd_files[i])
-        name = cd_files[i]
-        # print(name)
-        cd_actual = df_cd['sea_surface_temperature'][:,:]
-        times = df_cd.variables['time'][:]
-        units = df_cd.variables['time'].units  
-        t = num2date(times, units = units, calendar='365_day') 
-        t -= timedelta(days=9)
-        c = str(t[0].year) + date_info(t[0].month) + date_info(t[0].day)
-        if 'night' in str(name):
-            d = c + 'N'
-        elif 'day' in str(name):
-            d = c + 'D'
-                    
-        for pos,p in zip(index_cd,points):
-            c1 = int(p[0] * 100)
-            k1 = c1 - c1%5
-            c2 = int(p[1] * 100)
-            k2 = c2 - c2%5
-            data = cd_actual[0][pos[0],pos[1]].astype(float)
-            # print(d,dict[k1],dict[k2],data)
-            if cd_actual.mask[0][pos[0],pos[1]] == False:
-                data = cd_actual[0][pos[0],pos[1]].astype(float)
-                # print(d,dict[k1],dict[k2],data)
-                cursor.execute('''DELETE FROM climate_temperature  \
-                    WHERE date= %s and latitude = %s and longitude = %s;''', (d,dict[k1],dict[k2]))
-                cursor.execute('''INSERT INTO climate_temperature(date, latitude, longitude, sea_surface_temperature) \
-                            VALUES (%s,%s, %s, %s);''', (d,dict[k1],dict[k2],data)) 
-            else:
-                data = None
-                k.append(data)
-        
-        # with open(r'fact_tables/Climate_Temperature_null.csv', 'a', newline="", encoding='UTF8') as f:
-        #         writer = csv.writer(f)
-        #         writer.writerow([name,len(k)])
-   
 
-        
+    ilats = np.abs(np.floor((-90 - points_lat_flat) / grid)).astype(int)
+    ilons = np.abs(np.floor((-180 - points_lon_flat) / grid)).astype(int)
+
+    index_cd = list(zip(ilats, ilons))
+
+    connection_string = f"postgresql://{connection_info['user']}:{connection_info['password']}@{connection_info['host']}:{connection_info['port']}/{connection_info['database']}"
+
+    with Pool() as pool:
+        pool.map(process_file, [(file, path_cd, index_cd, points, dict, connection_string) for file in cd_files])
+
+    end_time = time()
+
+    return end_time - start_time

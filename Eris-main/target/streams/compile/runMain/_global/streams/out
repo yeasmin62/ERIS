@@ -1,0 +1,36 @@
+[0m[[0m[31merror[0m] [0m[0morg.postgresql.util.PSQLException: ERROR: type "sparsevec" does not exist[0m
+[0m[[0m[31merror[0m] [0m[0m  Position: 525[0m
+[0m[[0m[31merror[0m] [0m[0m	at org.postgresql.core.v3.QueryExecutorImpl.receiveErrorResponse(QueryExecutorImpl.java:2674)[0m
+[0m[[0m[31merror[0m] [0m[0m	at org.postgresql.core.v3.QueryExecutorImpl.processResults(QueryExecutorImpl.java:2364)[0m
+[0m[[0m[31merror[0m] [0m[0m	at org.postgresql.core.v3.QueryExecutorImpl.execute(QueryExecutorImpl.java:354)[0m
+[0m[[0m[31merror[0m] [0m[0m	at org.postgresql.jdbc.PgStatement.executeInternal(PgStatement.java:484)[0m
+[0m[[0m[31merror[0m] [0m[0m	at org.postgresql.jdbc.PgStatement.execute(PgStatement.java:404)[0m
+[0m[[0m[31merror[0m] [0m[0m	at org.postgresql.jdbc.PgStatement.executeWithFlags(PgStatement.java:325)[0m
+[0m[[0m[31merror[0m] [0m[0m	at org.postgresql.jdbc.PgStatement.executeCachedSql(PgStatement.java:311)[0m
+[0m[[0m[31merror[0m] [0m[0m	at org.postgresql.jdbc.PgStatement.executeWithFlags(PgStatement.java:287)[0m
+[0m[[0m[31merror[0m] [0m[0m	at org.postgresql.jdbc.PgStatement.executeUpdate(PgStatement.java:261)[0m
+[0m[[0m[31merror[0m] [0m[0m	at Loader$.$anonfun$load$2(Loader.scala:36)[0m
+[0m[[0m[31merror[0m] [0m[0m	at Loader$.$anonfun$load$2$adapted(Loader.scala:31)[0m
+[0m[[0m[31merror[0m] [0m[0m	at scala.collection.immutable.Map$Map1.foreach(Map.scala:258)[0m
+[0m[[0m[31merror[0m] [0m[0m	at Loader$.load(Loader.scala:31)[0m
+[0m[[0m[31merror[0m] [0m[0m	at Loader$.main(Loader.scala:58)[0m
+[0m[[0m[31merror[0m] [0m[0m	at Loader.main(Loader.scala)[0m
+[0m[[0m[31merror[0m] [0m[0m	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)[0m
+[0m[[0m[31merror[0m] [0m[0m	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)[0m
+[0m[[0m[31merror[0m] [0m[0m	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)[0m
+[0m[[0m[31merror[0m] [0m[0m	at java.base/java.lang.reflect.Method.invoke(Method.java:566)[0m
+[0m[[0m[31merror[0m] [0m[0m	at sbt.Run.invokeMain(Run.scala:143)[0m
+[0m[[0m[31merror[0m] [0m[0m	at sbt.Run.execute$1(Run.scala:93)[0m
+[0m[[0m[31merror[0m] [0m[0m	at sbt.Run.$anonfun$runWithLoader$5(Run.scala:120)[0m
+[0m[[0m[31merror[0m] [0m[0m	at sbt.Run$.executeSuccess(Run.scala:186)[0m
+[0m[[0m[31merror[0m] [0m[0m	at sbt.Run.runWithLoader(Run.scala:120)[0m
+[0m[[0m[31merror[0m] [0m[0m	at sbt.Defaults$.$anonfun$bgRunMainTask$7(Defaults.scala:1948)[0m
+[0m[[0m[31merror[0m] [0m[0m	at sbt.Defaults$.$anonfun$termWrapper$2(Defaults.scala:1919)[0m
+[0m[[0m[31merror[0m] [0m[0m	at scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.java:23)[0m
+[0m[[0m[31merror[0m] [0m[0m	at scala.util.Try$.apply(Try.scala:213)[0m
+[0m[[0m[31merror[0m] [0m[0m	at sbt.internal.BackgroundThreadPool$BackgroundRunnable.run(DefaultBackgroundJobService.scala:366)[0m
+[0m[[0m[31merror[0m] [0m[0m	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)[0m
+[0m[[0m[31merror[0m] [0m[0m	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)[0m
+[0m[[0m[31merror[0m] [0m[0m	at java.base/java.lang.Thread.run(Thread.java:834)[0m
+[0m[[0m[31merror[0m] [0m[0m(Compile / [31mrunMain[0m) org.postgresql.util.PSQLException: ERROR: type "sparsevec" does not exist[0m
+[0m[[0m[31merror[0m] [0m[0m  Position: 525[0m

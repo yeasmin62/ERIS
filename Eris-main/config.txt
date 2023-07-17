@@ -1,4 +1,4 @@
 localhost
-Sat
+Satn
 postgres
 31766

@@ -1,85 +1,26 @@
-# from Months import Months
-import psycopg2
 import os
+import pandas as pd
+from sqlalchemy import create_engine
 
-def load_dim(conn, cursor):
-  script_directory = os.path.dirname(os.path.abspath(__file__))  # taking the directory of the folder
+def load_dim(connection_info):
+    script_directory = os.path.dirname(os.path.abspath(__file__))  # taking the directory of the folder
 
+    csv_files = {
+        'dates': 'Dimensioncsv/Dates.csv',
+        'months': 'Dimensioncsv/Months.csv',
+        'semiday': 'Dimensioncsv/Semi-Day.csv',
+        'resolution020': 'Dimensioncsv/Degree_0.20.csv',
+        'resolution005': 'Dimensioncsv/Degree_0.05.csv',
+        'resolution004': 'Dimensioncsv/Degree_0.04.csv',
+        'resolution001': 'Dimensioncsv/Degree_0.01.csv',
+    }
+    connection_string = f"postgresql://{connection_info['user']}:{connection_info['password']}@{connection_info['host']}:{connection_info['port']}/{connection_info['database']}"
+    engine = create_engine(connection_string)
 
-  sql = ['''COPY Dates(id,week,
-  month, monthofyear,year)
-  FROM '{}'
-  DELIMITER ','
-  CSV HEADER;'''.format(os.path.join(script_directory, 'Dimensioncsv/Dates.csv')),'''COPY Months(id,monthofyear,
-  year)
-  FROM '{}'
-  DELIMITER ','
-  CSV HEADER;'''.format(os.path.join(script_directory, 'Dimensioncsv/Months.csv')),'''COPY Semiday(id,dateofsemiday,
-  time)
-  FROM '{}'
-  DELIMITER ','
-  CSV HEADER;'''.format(os.path.join(script_directory, 'Dimensioncsv/Semi-Day.csv')),'''COPY Resolution020(Degree020)
-  FROM '{}'
-  DELIMITER ','
-  CSV HEADER;'''.format(os.path.join(script_directory, 'Dimensioncsv/Degree_0.20.csv')),'''COPY Resolution005(Degree005,Degree020)
-  FROM '{}'
-  DELIMITER ','
-  CSV HEADER;'''.format(os.path.join(script_directory, 'Dimensioncsv/Degree_0.05.csv')),'''COPY Resolution004(Degree004, Degree020)
-  FROM '{}'
-  DELIMITER ','
-  CSV HEADER;'''.format(os.path.join(script_directory, 'Dimensioncsv/Degree_0.04.csv')),'''COPY Resolution001(Degree001,Degree004,Degree005, Degree020)
-  FROM '{}'
-  DELIMITER ','
-  CSV HEADER;'''.format(os.path.join(script_directory, 'Dimensioncsv/Degree_0.01.csv'))]
+    for table_name, csv_file in csv_files.items():
+        df = pd.read_csv(os.path.join(script_directory, csv_file))
+        df.to_sql(table_name, con=engine, if_exists='append', index=False)
 
-  for query in sql:
-    cursor.execute(query)
-
-  ###########Registering into schema###########
-
-  schemaInsertion = ['''insert into schema (tablename, fieldname, key, varfree)
-  values ('Dates', 'id', true, false);''',
-  '''insert into schema (tablename, fieldname, key, varfree)
-  values ('Dates', 'week', true, false);''',
-  '''insert into schema (tablename, fieldname, key, varfree)
-  values ('Dates', 'month', true, false);''',
-  '''insert into schema (tablename, fieldname, key, varfree)
-  values ('Dates', 'monthofyear', true, false);''',
-  '''insert into schema (tablename, fieldname, key, varfree)
-  values ('Dates', 'year', true, false);''',
-  '''insert into schema (tablename, fieldname, key, varfree)
-  values ('Semiday', 'id', true, false);''',
-  '''insert into schema (tablename, fieldname, key, varfree)
-  values ('Semiday', 'dateofsemiday', true, false);''',
-  '''insert into schema (tablename, fieldname, key, varfree)
-  values ('Semiday', 'time', true, false);''',
-  '''insert into schema (tablename, fieldname, key, varfree)
-  values ('Resolution005', 'Degree005', true, false);''',
-  '''insert into schema (tablename, fieldname, key, varfree)
-  values ('Resolution005', 'Degree020', true, false);''',
-  '''insert into schema (tablename, fieldname, key, varfree)
-  values ('Resolution004', 'Degree004', true, false);''',
-  '''insert into schema (tablename, fieldname, key, varfree)
-  values ('Resolution004', 'Degree020', true, false);''',
-  '''insert into schema (tablename, fieldname, key, varfree)
-  values ('Resolution020', 'Degree020', true, false);''',
-  '''insert into schema (tablename, fieldname, key, varfree)
-  values ('Resolution001', 'Degree001', true, false);''',
-  '''insert into schema (tablename, fieldname, key, varfree)
-  values ('Resolution001', 'Degree004', true, false);''',
-  '''insert into schema (tablename, fieldname, key, varfree)
-  values ('Resolution001', 'Degree005', true, false);''',
-  '''insert into schema (tablename, fieldname, key, varfree)
-  values ('Resolution001', 'Degree020', true, false);''',
-  '''insert into schema (tablename, fieldname, key, varfree)
-  values ('Months', 'id', true, false);''',
-  '''insert into schema (tablename, fieldname, key, varfree)
-  values ('Months', 'monthofyear', true, false);''',
-  '''insert into schema (tablename, fieldname, key, varfree)
-  values ('Months', 'year', true, false);''']
-
-  for query in schemaInsertion:
-    cursor.execute(query)
-
+  
 
 

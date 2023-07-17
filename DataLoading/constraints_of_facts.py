@@ -39,39 +39,5 @@ def fact_constraints(conn, cursor):
     for q in foreignKeys:
         cursor.execute(q)
 
-    schemaInsertion = ['''insert into schema (tablename, fieldname, key, varfree)
-    values ('Copernicus_Temperature', 'date', true, false);''',
-    '''insert into schema (tablename, fieldname, key, varfree)
-    values ('Copernicus_Temperature', 'latitude', true, false);''',
-    '''insert into schema (tablename, fieldname, key, varfree)
-    values ('Copernicus_Temperature', 'longitude', true, false);''',
-    '''insert into schema (tablename, fieldname, key, varfree)
-    values ('Copernicus_Temperature', 'Sea_surface_temperature', false, false);''',
-    '''insert into schema (tablename, fieldname, key, varfree)
-    values ('Climate_Temperature', 'date', true, false);''',
-    '''insert into schema (tablename, fieldname, key, varfree)
-    values ('Climate_Temperature', 'latitude', true, false);''',
-    '''insert into schema (tablename, fieldname, key, varfree)
-    values ('Climate_Temperature', 'longitude', true, false);''',
-    '''insert into schema (tablename, fieldname, key, varfree)
-    values ('Climate_Temperature', 'Sea_surface_temperature', false, false);''',
-    '''insert into schema (tablename, fieldname, key, varfree)
-    values ('Modisaqua_Temperature', 'date', true, false);''',
-    '''insert into schema (tablename, fieldname, key, varfree)
-    values ('Modisaqua_Temperature', 'latitude', true, false);''',
-    '''insert into schema (tablename, fieldname, key, varfree)
-    values ('Modisaqua_Temperature', 'longitude', true, false);''',
-    '''insert into schema (tablename, fieldname, key, varfree)
-    values ('Modisaqua_Temperature', 'Sea_surface_temperature', false, false);''',
-    '''insert into schema (tablename, fieldname, key, varfree)
-    values ('Pathfinder_Temperature', 'date', true, false);''',
-    '''insert into schema (tablename, fieldname, key, varfree)
-    values ('Pathfinder_Temperature', 'latitude', true, false);''',
-    '''insert into schema (tablename, fieldname, key, varfree)
-    values ('Pathfinder_Temperature', 'longitude', true, false);''',
-    '''insert into schema (tablename, fieldname, key, varfree)
-    values ('Pathfinder_Temperature', 'Sea_surface_temperature', false, false);''']
-
-    for query in schemaInsertion:
-        cursor.execute(query)
+    
 

@@ -1,0 +1,8 @@
+create a batch with 
+
+making more efficient --- instead of using delete command
+
+if there is any repitation in the primary key, we can update it to reduce the inserting time
+
+
+replace copy with insert in the load dimension

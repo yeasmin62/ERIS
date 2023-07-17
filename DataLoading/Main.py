@@ -7,6 +7,7 @@ import load_climate_fact_table
 import load_copernicus_fact_table
 import load_modisaqua_fact_table
 import load_pathfinder_fact_table
+import schema_insertion
 
 def database_connection(config_file_name):
     ''' This Function will connect to the database'''
@@ -35,6 +36,13 @@ def database_connection(config_file_name):
 
 
 if __name__ == "__main__":
+
+    with open('config.txt', 'r') as file:
+        connection_info = {}
+        for line in file:
+            key, value = line.strip().split('=')
+            connection_info[key] = value
+
     conn, cursor = database_connection(config_file_name='config.txt')
     # print(conn)
 
@@ -47,14 +55,30 @@ if __name__ == "__main__":
     # calling fact tables constraints function
     constraints_of_facts.fact_constraints(conn,cursor)
 
+    #calling schema Insertion function
+    schema_insertion.schemaInsert(conn,cursor)
+
+
     # calling loading dimension function
-    load_dimensions.load_dim(conn, cursor)
+    load_dimensions.load_dim(connection_info)
 
     # calling all the functions of loading data
-    load_climate_fact_table.load_climate(conn,cursor)
-    load_copernicus_fact_table.load_copernicus(conn,cursor)
-    load_modisaqua_fact_table.load_modsaqua(conn,cursor)
-    load_pathfinder_fact_table.load_pathfinder(conn, cursor)
+    # run_time = load_climate_fact_table.load_climate(connection_info)
+    print('Loading data into climate\n')
+    run_time = load_climate_fact_table.load_climate(connection_info)
+    print(f"Time to insert into climate = {run_time}s")
+
+    print("Loading data into copernicus\n")
+    run_time_copernicus = load_copernicus_fact_table.load_copernicus(connection_info)
+    print(f'loading time is {run_time_copernicus}s')
+
+    print('Loading data into modisaqua table\n')
+    run_time_modis = load_modisaqua_fact_table.load_modsaqua(connection_info)
+    print(f'Loading time {run_time_modis}')
+    
+    print('Loading data into pathfinder table\n')
+    run_time_path = load_pathfinder_fact_table.load_pathfinder(connection_info)
+    print(f"Time to insert into pathfinder = {run_time_path}s")
 
     # closing the database connection
     conn.close()

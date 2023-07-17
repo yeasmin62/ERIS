@@ -514,7 +514,7 @@ object GuiNew extends JFXApp {
     val tab4lbl1 = new Label("In your query you can apply this operations: Select (U+03c3), Project (π), ProjectAway (π), Join (⨝), Renaming (U+03C1), Difference ('\'), Aggregation (U+03b3)," +
 "UNION (∪), DUNION  (⊎), Coalescing (к) \n")
 
-    tab4vbox.children = List(tab4lbl, tab4lbl1)
+    // tab4vbox.children = List(tab4lbl, tab4lbl1)
 
     val rbn6 = new Button("EXIT") {
       layoutX = 260
