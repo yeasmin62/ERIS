@@ -165,7 +165,7 @@ object GuiScene2 extends JFXApp {
     tab4vbox.children.append(tab4scroll)
 
     lazy val backButton: Button = new Button {
-      text = "\u2190"
+      text = "back"
       disable = true
       onAction = (_: ActionEvent) => {
         pageIndex -= 1
@@ -174,7 +174,7 @@ object GuiScene2 extends JFXApp {
     }
 
     lazy val nextButton: Button = new Button {
-      text = "\u2192"
+      text = "next"
       disable = eqlength <= expressionsPerPage
       onAction = (_: ActionEvent) => {
         pageIndex += 1

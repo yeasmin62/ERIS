@@ -1,6 +1,6 @@
 import psycopg2
 
-def table_creation(conn, cursor):
+def table_creation(conn):
   sql = ['''DROP TABLE IF EXISTS schema CASCADE;
   CREATE TABLE IF NOT EXISTS public.schema
   (
@@ -72,6 +72,6 @@ def table_creation(conn, cursor):
 
 
   for query in sql:
-    cursor.execute(query)
+    conn.execute(query)
   
 

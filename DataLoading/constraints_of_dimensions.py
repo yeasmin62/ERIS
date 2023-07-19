@@ -1,6 +1,6 @@
 import psycopg2
 
-def dim_constraints(conn, cursor):
+def dim_constraints(conn):
     ########################### Primary Keys ################
     primaryKeys = ['''ALTER TABLE dates ADD CONSTRAINT dates_pk PRIMARY KEY (id);''',
     '''ALTER TABLE semiday ADD CONSTRAINT semiday_pk PRIMARY KEY (id);''',
@@ -9,7 +9,7 @@ def dim_constraints(conn, cursor):
     '''ALTER TABLE resolution001 ADD CONSTRAINT resolution001_pk PRIMARY KEY (Degree001);''',
     '''ALTER TABLE resolution020 ADD CONSTRAINT resolution020_pk PRIMARY KEY (Degree020);''']
     for q in primaryKeys:
-        cursor.execute(q)
+        conn.execute(q)
 
     ########################### Foreign Keys #################
     foreignKeys = ['''ALTER TABLE semiday ADD CONSTRAINT semiday_fk FOREIGN KEY (dateofsemiday)
@@ -26,4 +26,4 @@ def dim_constraints(conn, cursor):
     REFERENCES resolution020(degree020) ON DELETE CASCADE ON UPDATE CASCADE DEFERRABLE;''']
 
     for q in foreignKeys:
-        cursor.execute(q)
+        conn.execute(q)

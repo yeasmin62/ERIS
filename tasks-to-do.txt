@@ -1,0 +1,29 @@
+TO DO - 13.07.2023
+
+1. Create a batch processing
+
+2. making more efficient --- instead of using delete command
+
+3. If there is any repitation in the primary key, we can update it to reduce the inserting time
+
+4. Replace copy with insert in the load dimension
+
+TO DO - 17.07.2023
+
+1.  Give the constraints after loading the data- done
+
+2. and I need to analyze the dimensions and fact tables with sql query - done
+
+3. Remove the print during the interface - done
+
+4. Prepare the list of papers from eris and dpp
+
+5. Changing the interface with the null
+
+6. value interval should be independent
+
+7. Creating example of varfree problem
+
+8. Creating an example of why fact tables are generating duplicates - done
+
+next meeting - 21.07.2023 at 12

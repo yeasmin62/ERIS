@@ -8,6 +8,7 @@ from netCDF4 import num2date
 from stringclass import stringClass
 from sqlalchemy import create_engine, text
 from time import time
+import math
 
 def date_info(date):
     if(len(str(date))) < 2:
@@ -31,15 +32,35 @@ def process_file(args):
         d = c + 'D'
 
     data_list = []
+    cli_point_list = []
     for pos, p in zip(index_cd, points):
-        c1 = int(p[0] * 100)
-        k1 = c1 - c1 % 5
+        # print(p[0],p[1])
+        c1 = int(float(p[0] * 100))
+        k1 = c1 - (c1 % 5)
         c2 = int(p[1] * 100)
-        k2 = c2 - c2 % 5
+        k2 = c2 - (c2 % 5)
+        # if(k2==0):
+            # print(p[0],p[1],c1,c2,k1,k2)
+        cli_point_list.append([k1,k2])
         if not cd_actual.mask[0][pos[0], pos[1]]:
             data = cd_actual[0][pos[0], pos[1]].astype(float)
             data_list.append({'date': d, 'latitude': dict[k1], 'longitude': dict[k2],
                               'sea_surface_temperature': data})
+    # print(len(cli_point_list))
+    duplicates = []
+    seen = set()
+    for item in cli_point_list:
+    # Convert the sublist to a tuple for hashability
+        item_tuple = tuple(item)
+    
+    # If the item has been seen before, it's a duplicate
+        if item_tuple in seen:
+            duplicates.append(item_tuple)
+        else:
+            seen.add(item_tuple)
+    print(f'number of Duplicate values: {len(duplicates)}')
+    # for d in duplicates:
+        # print(d)
 
     data_df = pd.DataFrame(data_list)
     engine = create_engine(connection_string)
@@ -66,12 +87,15 @@ def load_climate(connection_info):
     for c in co_lon[:]:
         for i in c:
             if(i == '~'):
+                # print(math.ceil(float(c[:c.index(i) - 1]) * 100))
                 lonl = int(float(c[:c.index(i) - 1]) * 100)
-                if(lonl % 5 == 1):
+                if(lonl % 5 == 1): # for the negative values
                     lonl = lonl - 1
-                if(lonl % 5 == 4):
+                if(lonl % 5 == 4): # for the positive values
                     lonl = lonl + 1
                 dict[lonl] = c
+    
+    print(dict[-5])
 
     point_lat = pd.read_csv(r'Dimensioncsv/medi_lat.csv')
     point_lon = pd.read_csv(r'Dimensioncsv/medi_lon.csv')

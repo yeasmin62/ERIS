@@ -1,6 +1,6 @@
 
 
-def schemaInsert(conn, cursor):
+def schemaInsert(conn):
     sqlfunc = ['''drop aggregate if exists keep_any(double precision);
     drop function if exists keep_any(a double precision, b double precision);
 
@@ -95,7 +95,7 @@ def schemaInsert(conn, cursor):
       );''']
     
     for query in sqlfunc:
-        cursor.execute(query)
+        conn.execute(query)
 
 
     factschemaInsertion = ['''insert into schema (tablename, fieldname, key, varfree)
@@ -132,7 +132,7 @@ def schemaInsert(conn, cursor):
     values ('Pathfinder_Temperature', 'Sea_surface_temperature', false, false);''']
 
     for query in factschemaInsertion:
-        cursor.execute(query)
+        conn.execute(query)
 
     dimschemaInsertion = ['''insert into schema (tablename, fieldname, key, varfree)
   values ('Dates', 'id', true, false);''',
@@ -176,7 +176,7 @@ def schemaInsert(conn, cursor):
   values ('Months', 'year', true, false);''']
 
     for query in dimschemaInsertion:
-      cursor.execute(query)
+      conn.execute(query)
 
 
 

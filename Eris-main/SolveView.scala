@@ -131,7 +131,7 @@ object  SolveView {
     val eq = encoder.queryEncoding(str)
     val equa = encoder.iterateEncodedConstraints(conn,eq,es)
     val equaList = equa.toList
-    print(equaList)
+    // print(equaList)
     equaList
     // val (valuation,objective) = solveList(equations.toList)
     // (valuation, objective)

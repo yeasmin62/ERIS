@@ -1,6 +1,6 @@
 import psycopg2
 
-def fact_constraints(conn, cursor):
+def fact_constraints(conn):
     ########################### Primary Keys #################
     primaryKeys = ['''ALTER TABLE copernicus_temperature ADD CONSTRAINT copernicus_temperature_pk PRIMARY KEY ("date",latitude,longitude);''',
     '''ALTER TABLE climate_temperature ADD CONSTRAINT climate_temperature_pk PRIMARY KEY ("date",latitude,longitude);''',
@@ -8,7 +8,7 @@ def fact_constraints(conn, cursor):
     '''ALTER TABLE pathfinder_temperature ADD CONSTRAINT pathfinder_temperature_pk PRIMARY KEY ("date",latitude,longitude);''']
 
     for q in primaryKeys:
-        cursor.execute(q)
+        conn.execute(q)
 
     ########################### Foreign Keys #################
     foreignKeys = ['''ALTER TABLE copernicus_temperature ADD CONSTRAINT copernicus_temperature_fk3 FOREIGN KEY (latitude) 
@@ -37,7 +37,7 @@ def fact_constraints(conn, cursor):
     REFERENCES Resolution004(degree004) ON DELETE CASCADE ON UPDATE CASCADE DEFERRABLE;''']
 
     for q in foreignKeys:
-        cursor.execute(q)
+        conn.execute(q)
 
     
 
