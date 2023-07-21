@@ -16,13 +16,13 @@ TO DO - 17.07.2023
 
 3. Remove the print during the interface - done
 
-4. Prepare the list of papers from eris and dpp
+4. Prepare the list of papers from eris and dpp - done
 
-5. Changing the interface with the null
+5. Changing the interface with the null - done
 
-6. value interval should be independent
+6. value interval should be independent - done but need to improve
 
-7. Creating example of varfree problem
+7. Creating example of varfree problem - done
 
 8. Creating an example of why fact tables are generating duplicates - done
 

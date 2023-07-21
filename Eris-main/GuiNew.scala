@@ -38,7 +38,7 @@ object GuiNew extends JFXApp {
     title.value = "Eris: Discord measurement prototype"
   }
 
-  scene1 = new Scene(350, 400) {
+  scene1 = new Scene(400, 450) {
 
     // var input_text: String = " "
 
@@ -101,13 +101,13 @@ object GuiNew extends JFXApp {
     }
     val toggol2 = new ToggleGroup
     toggol2.toggles = List(rbn3, rbn4)
-    val label2 = new Label("Consideration of NULL") {}
-    val rbn_null = new RadioButton("With NULL") {
+    val label2 = new Label("Do you want to consider NULL in cost function?") {}
+    val rbn_null = new RadioButton("Yes") {
       onAction = (e: ActionEvent) => {
         flag_null = "true"
       }
     }
-    val rbn_not_null = new RadioButton("Without NULL") {
+    val rbn_not_null = new RadioButton("No") {
       onAction = (e: ActionEvent) => {
         flag_null = "false"
       }

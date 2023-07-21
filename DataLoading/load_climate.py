@@ -19,11 +19,11 @@ def date_info(date):
 def generate_keys(lat,lon):
     # Handle rounding differently for positive and negative values
     c1 = round(lat * 100)
-    c1 = c1 - 1 if c1 < 0 else c1 + 1
+    c1 = c1 - 1 if c1 < 0 else c1 
     k1 = c1 - (c1 % 5)  # calculate the closest multiple of 5
 
     c2 = round(lon * 100)
-    c2 = c2 - 1 if c2 < 0 else c2 + 1 
+    c2 = c2 - 1 if c2 < 0 else c2 
     k2 = c2 - (c2 % 5)  # calculate the closest multiple of 5
     
     return k1, k2

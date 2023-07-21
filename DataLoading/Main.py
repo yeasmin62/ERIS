@@ -51,31 +51,34 @@ if __name__ == "__main__":
     # calling the analyze dimension tables function
     analyze_table.analyze_dimension_tables(connection_info)
 
+    
     # calling fact tables constraints function
     constraints_of_facts.fact_constraints(conn)
 
     # calling all the functions of loading data
-    # run_time = load_climate_fact_table.load_climate(connection_info)
+    run_time = load_climate_fact_table.load_climate(connection_info)
     print('Loading data into climate\n')
     run_time = load_climate_fact_table.load_climate(connection_info)
     print(f"Time to insert into climate = {run_time}s")
 
-    # print("Loading data into copernicus\n")
-    # run_time_copernicus = load_copernicus_fact_table.load_copernicus(connection_info)
-    # print(f'loading time is {run_time_copernicus}s')
+    print("Loading data into copernicus\n")
+    run_time_copernicus = load_copernicus_fact_table.load_copernicus(connection_info)
+    print(f'loading time is {run_time_copernicus}s')
 
-    # print('Loading data into modisaqua table\n')
-    # run_time_modis = load_modisaqua_fact_table.load_modsaqua(connection_info)
-    # print(f'Loading time {run_time_modis}')
+    print('Loading data into modisaqua table\n')
+    run_time_modis = load_modisaqua_fact_table.load_modsaqua(connection_info)
+    print(f'Loading time {run_time_modis}')
     
-    # print('Loading data into pathfinder table\n')
-    # run_time_path = load_pathfinder_fact_table.load_pathfinder(connection_info)
-    # print(f"Time to insert into pathfinder = {run_time_path}s")
+    print('Loading data into pathfinder table\n')
+    run_time_path = load_pathfinder_fact_table.load_pathfinder(connection_info)
+    print(f"Time to insert into pathfinder = {run_time_path}s")
 
-    
+
 
     # calling the analyze fact tables function
     analyze_table.analyze_fact_tables(connection_info)
+
+
 
     # closing the database connection
     conn.close()

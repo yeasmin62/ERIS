@@ -38,14 +38,14 @@ def load_modsaqua(connection_info):
     co_lon = coords_lon['degree004'][:].to_numpy()
     dict = {}
     for c in co_lon[:]:
-        for i in c:
-            if(i=='~'):
-                lonl = int(float(c[:c.index(i)-1])*100)
-                if(lonl%4==1):
-                    lonl = lonl - 1
-                if (lonl%4==3):
-                    lonl = lonl + 1
-                dict[lonl]=c
+        range_start = float(c.split('~')[0])  # Extract the range start value
+        # Convert the range start value to an integer key
+        lonl = int(range_start * 100)
+        if(lonl % 4 == 1):
+            lonl = lonl - 1
+        if(lonl % 4 == 3):
+            lonl = lonl + 1
+        dict[lonl] = c
 
     point_lat = pd.read_csv(r'Dimensioncsv/medi_lat.csv')
     point_lon = pd.read_csv(r'Dimensioncsv/medi_lon.csv')
