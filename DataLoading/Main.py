@@ -4,6 +4,7 @@ import create_tables
 import constraints_of_dimensions
 import constraints_of_facts
 import load_dimensions
+import load_climate
 import load_climate_fact_table
 import load_copernicus_fact_table
 import load_modisaqua_fact_table
@@ -52,11 +53,9 @@ if __name__ == "__main__":
     analyze_table.analyze_dimension_tables(connection_info)
 
     
-    # calling fact tables constraints function
-    constraints_of_facts.fact_constraints(conn)
-
+    
     # calling all the functions of loading data
-    run_time = load_climate_fact_table.load_climate(connection_info)
+    # run_time = load_climate_fact_table.load_climate(connection_info)
     print('Loading data into climate\n')
     run_time = load_climate_fact_table.load_climate(connection_info)
     print(f"Time to insert into climate = {run_time}s")
@@ -72,8 +71,9 @@ if __name__ == "__main__":
     print('Loading data into pathfinder table\n')
     run_time_path = load_pathfinder_fact_table.load_pathfinder(connection_info)
     print(f"Time to insert into pathfinder = {run_time_path}s")
-
-
+    
+    # calling fact tables constraints function
+    constraints_of_facts.fact_constraints(conn)
 
     # calling the analyze fact tables function
     analyze_table.analyze_fact_tables(connection_info)

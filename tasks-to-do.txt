@@ -27,3 +27,6 @@ TO DO - 17.07.2023
 8. Creating an example of why fact tables are generating duplicates - done
 
 next meeting - 21.07.2023 at 12
+
+
+next meeting - 27.07.2023 at 2.30pm

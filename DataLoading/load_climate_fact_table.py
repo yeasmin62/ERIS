@@ -19,11 +19,11 @@ def date_info(date):
 def generate_keys(lat,lon):
     # Handle rounding differently for positive and negative values
     c1 = round(lat * 100)
-    c1 = c1 - 1 if c1 < 0 else c1 + 1
+    c1 = c1 - 1 if c1 < 0 else c1 
     k1 = c1 - (c1 % 5)  # calculate the closest multiple of 5
 
     c2 = round(lon * 100)
-    c2 = c2 - 1 if c2 < 0 else c2 + 1 
+    c2 = c2 - 1 if c2 < 0 else c2 
     k2 = c2 - (c2 % 5)  # calculate the closest multiple of 5
     
     return k1, k2
@@ -48,33 +48,11 @@ def process_file(args):
     cli_point_list = []
     for pos, p in zip(index_cd, points):
         k1, k2 = generate_keys(p[0],p[1])
-        # print(k1,k2)
- 
-        # if(k2==0):
-            # print(p[0],p[1],c1,c2,k1,k2)
         cli_point_list.append([k1,k2])
         if not cd_actual.mask[0][pos[0], pos[1]]:
             data = cd_actual[0][pos[0], pos[1]].astype(float)
             data_list.append({'date': d, 'latitude': dict_lat_lon[k1], 'longitude': dict_lat_lon[k2],
                               'sea_surface_temperature': data})
-        else:
-            data = None
-            no_data_list.append([k1,k2,data])
-    print(len(no_data_list))
-    duplicates = []
-    seen = set()
-    for item in cli_point_list:
-    # Convert the sublist to a tuple for hashability
-        item_tuple = tuple(item)
-    
-    # If the item has been seen before, it's a duplicate
-        if item_tuple in seen:
-            duplicates.append(item_tuple)
-        else:
-            seen.add(item_tuple)
-    print(f'number of Duplicate values: {len(duplicates)}')
-    # for d in duplicates:
-        # print(d)
 
     data_df = pd.DataFrame(data_list)
     engine = create_engine(connection_string)

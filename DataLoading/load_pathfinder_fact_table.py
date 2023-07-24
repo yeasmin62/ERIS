@@ -14,6 +14,18 @@ def date_info(date):
         return '0' + str(date)
     else:
         return str(date)
+    
+def generate_keys(lat,lon):
+    # Handle rounding differently for positive and negative values
+    c1 = round(lat * 100)
+    c1 = c1 - 1 if c1 < 0 else c1 
+    k1 = c1 - (c1 % 4)  # calculate the closest multiple of 5
+
+    c2 = round(lon * 100)
+    c2 = c2 - 1 if c2 < 0 else c2 
+    k2 = c2 - (c2 % 4)  # calculate the closest multiple of 5
+    
+    return k1, k2
 
 def process_file(args):
     file, path_cd, index_cd, points, dict, connection_string = args
@@ -32,10 +44,7 @@ def process_file(args):
 
     data_list = []
     for pos, p in zip(index_cd, points):
-        c1 = int(p[0] * 100)
-        k1 = c1 - c1 % 4
-        c2 = int(p[1] * 100)
-        k2 = c2 - c2 % 4
+        k1,k2 = generate_keys(p[0],p[1])
         if not cd_actual.mask[0][pos[0], pos[1]]:
             data = cd_actual[0][pos[0], pos[1]].astype(float)
             data_list.append({'date': d, 'latitude': dict[k1], 'longitude': dict[k2],

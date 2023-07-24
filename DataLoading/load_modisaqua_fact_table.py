@@ -5,6 +5,18 @@ import pandas as pd
 from sqlalchemy import create_engine
 import numpy as np
 
+def generate_keys(lat,lon):
+    # Handle rounding differently for positive and negative values
+    c1 = round(lat * 100)
+    c1 = c1 - 1 if c1 < 0 else c1 
+    k1 = c1 - (c1 % 4)  # calculate the closest multiple of 5
+
+    c2 = round(lon * 100)
+    c2 = c2 - 1 if c2 < 0 else c2 
+    k2 = c2 - (c2 % 4)  # calculate the closest multiple of 5
+    
+    return k1, k2
+
 def process_file(args):
     filename, path_cd, index_cd, points, dict, connection_string = args
     date = filename.split('.')[1]  # extract date from filename
@@ -13,11 +25,7 @@ def process_file(args):
 
     data_list = []
     for pos,p in zip(index_cd,points):
-        c1 = int(p[0] * 100)
-        k1 = c1 - c1%4
-        c2 = int(p[1] * 100)
-        k2 = c2 - c2%4
-
+        k1,k2 = generate_keys(p[0],p[1])
         if not sst4.mask[pos[0],pos[1]]:
             data = sst4[pos[0],pos[1]].astype(float)
             data_list.append({'date': date, 'latitude': dict[k1], 'longitude': dict[k2], 'sea_surface_temperature': data})

@@ -89,7 +89,7 @@ def load_copernicus(connection_info):
         dict[lonl]=c
 
     nc = Dataset(filename, 'r', Format='NETCDF4')
-    time_chunks = np.array_split(np.arange(len(nc.variables['time'][:1])), os.cpu_count())
+    time_chunks = np.array_split(np.arange(len(nc.variables['time'][:3])), os.cpu_count())
     nc.close()
 
     with Pool() as pool:
