@@ -4,7 +4,6 @@ import create_tables
 import constraints_of_dimensions
 import constraints_of_facts
 import load_dimensions
-import load_climate
 import load_climate_fact_table
 import load_copernicus_fact_table
 import load_modisaqua_fact_table
