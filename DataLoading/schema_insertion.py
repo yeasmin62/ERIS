@@ -1,6 +1,5 @@
-
-
-def schemaInsert(conn):
+import psycopg2
+def schemaInsert(cursor):
     sqlfunc = ['''drop aggregate if exists keep_any(double precision);
     drop function if exists keep_any(a double precision, b double precision);
 
@@ -95,7 +94,7 @@ def schemaInsert(conn):
       );''']
     
     for query in sqlfunc:
-        conn.execute(query)
+        cursor.execute(query)
 
 
     factschemaInsertion = ['''insert into schema (tablename, fieldname, key, varfree)
@@ -132,7 +131,7 @@ def schemaInsert(conn):
     values ('Pathfinder_Temperature', 'Sea_surface_temperature', false, false);''']
 
     for query in factschemaInsertion:
-        conn.execute(query)
+        cursor.execute(query)
 
     dimschemaInsertion = ['''insert into schema (tablename, fieldname, key, varfree)
   values ('Dates', 'id', true, false);''',
@@ -176,7 +175,7 @@ def schemaInsert(conn):
   values ('Months', 'year', true, false);''']
 
     for query in dimschemaInsertion:
-      conn.execute(query)
+      cursor.execute(query)
 
 
 

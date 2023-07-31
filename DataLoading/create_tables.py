@@ -1,6 +1,10 @@
 import psycopg2
 
-def table_creation(conn):
+
+def table_creation(cursor):
+  # connection_string = f"postgresql://{connection_info['user']}:{connection_info['password']}@{connection_info['host']}:{connection_info['port']}/{connection_info['database']}"
+  # engine = create_engine(connection_string)
+  # conn = engine.connect()
   sql = ['''DROP TABLE IF EXISTS schema CASCADE;
   CREATE TABLE IF NOT EXISTS public.schema
   (
@@ -72,6 +76,6 @@ def table_creation(conn):
 
 
   for query in sql:
-    conn.execute(query)
+    cursor.execute(query)
   
 

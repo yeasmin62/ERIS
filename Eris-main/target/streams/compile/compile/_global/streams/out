@@ -1,0 +1,60 @@
+[0m[[0m[33mwarn[0m] [0m[0mD:\PISTIS\Eris-main\EncodePartitioning.scala:396:11: method without a parameter list overrides a method with a single empty one[0m
+[0m[[0m[33mwarn[0m] [0m[0m      def next = current match {[0m
+[0m[[0m[33mwarn[0m] [0m[0m          ^[0m
+[0m[[0m[33mwarn[0m] [0m[0mD:\PISTIS\Eris-main\RAParser.scala:76:34: match may not be exhaustive.[0m
+[0m[[0m[33mwarn[0m] [0m[0mIt would fail on the following input: ~(~(_, (x: String forSome x not in "+")), _)[0m
+[0m[[0m[33mwarn[0m] [0m[0m    summation ~ "+" ~ product ^^ {[0m
+[0m[[0m[33mwarn[0m] [0m[0m                                 ^[0m
+[0m[[0m[33mwarn[0m] [0m[0mD:\PISTIS\Eris-main\RAParser.scala:78:38: match may not be exhaustive.[0m
+[0m[[0m[33mwarn[0m] [0m[0mIt would fail on the following input: ~(~(_, (x: String forSome x not in "-")), _)[0m
+[0m[[0m[33mwarn[0m] [0m[0m    } | summation ~ "-" ~ product ^^ {[0m
+[0m[[0m[33mwarn[0m] [0m[0m                                     ^[0m
+[0m[[0m[33mwarn[0m] [0m[0mD:\PISTIS\Eris-main\RAParser.scala:83:31: match may not be exhaustive.[0m
+[0m[[0m[33mwarn[0m] [0m[0mIt would fail on the following input: ~(~(_, (x: String forSome x not in "*")), _)[0m
+[0m[[0m[33mwarn[0m] [0m[0m    product ~ "*" ~ atomic ^^ {[0m
+[0m[[0m[33mwarn[0m] [0m[0m                              ^[0m
+[0m[[0m[33mwarn[0m] [0m[0mD:\PISTIS\Eris-main\RAParser.scala:85:35: match may not be exhaustive.[0m
+[0m[[0m[33mwarn[0m] [0m[0mIt would fail on the following input: ~(~(_, (x: String forSome x not in "/")), _)[0m
+[0m[[0m[33mwarn[0m] [0m[0m    } | product ~ "/" ~ atomic ^^ {[0m
+[0m[[0m[33mwarn[0m] [0m[0m                                  ^[0m
+[0m[[0m[33mwarn[0m] [0m[0mD:\PISTIS\Eris-main\RAParser.scala:118:40: match may not be exhaustive.[0m
+[0m[[0m[33mwarn[0m] [0m[0mIt would fail on the following input: ~(~(_, (x: String forSome x not in "=")), _)[0m
+[0m[[0m[33mwarn[0m] [0m[0m      } | expression~"="~expression ^^ {[0m
+[0m[[0m[33mwarn[0m] [0m[0m                                       ^[0m
+[0m[[0m[33mwarn[0m] [0m[0mD:\PISTIS\Eris-main\RAParser.scala:120:41: match may not be exhaustive.[0m
+[0m[[0m[33mwarn[0m] [0m[0mIt would fail on the following input: ~(~(_, (x: String forSome x not in "<>")), _)[0m
+[0m[[0m[33mwarn[0m] [0m[0m      } | expression~"<>"~expression ^^ {[0m
+[0m[[0m[33mwarn[0m] [0m[0m                                        ^[0m
+[0m[[0m[33mwarn[0m] [0m[0mD:\PISTIS\Eris-main\RAParser.scala:122:40: match may not be exhaustive.[0m
+[0m[[0m[33mwarn[0m] [0m[0mIt would fail on the following input: ~(~(_, (x: String forSome x not in "<")), _)[0m
+[0m[[0m[33mwarn[0m] [0m[0m      } | expression~"<"~expression ^^ {[0m
+[0m[[0m[33mwarn[0m] [0m[0m                                       ^[0m
+[0m[[0m[33mwarn[0m] [0m[0mD:\PISTIS\Eris-main\RAParser.scala:124:41: match may not be exhaustive.[0m
+[0m[[0m[33mwarn[0m] [0m[0mIt would fail on the following input: ~(~(_, (x: String forSome x not in "<=")), _)[0m
+[0m[[0m[33mwarn[0m] [0m[0m      } | expression~"<="~expression ^^ {[0m
+[0m[[0m[33mwarn[0m] [0m[0m                                        ^[0m
+[0m[[0m[33mwarn[0m] [0m[0mD:\PISTIS\Eris-main\RAParser.scala:126:40: match may not be exhaustive.[0m
+[0m[[0m[33mwarn[0m] [0m[0mIt would fail on the following input: ~(~(_, (x: String forSome x not in ">")), _)[0m
+[0m[[0m[33mwarn[0m] [0m[0m      } | expression~">"~expression ^^ {[0m
+[0m[[0m[33mwarn[0m] [0m[0m                                       ^[0m
+[0m[[0m[33mwarn[0m] [0m[0mD:\PISTIS\Eris-main\RAParser.scala:128:41: match may not be exhaustive.[0m
+[0m[[0m[33mwarn[0m] [0m[0mIt would fail on the following input: ~(~(_, (x: String forSome x not in ">=")), _)[0m
+[0m[[0m[33mwarn[0m] [0m[0m      } | expression~">="~expression ^^ {[0m
+[0m[[0m[33mwarn[0m] [0m[0m                                        ^[0m
+[0m[[0m[33mwarn[0m] [0m[0mD:\PISTIS\Eris-main\RAParser.scala:137:43: match may not be exhaustive.[0m
+[0m[[0m[33mwarn[0m] [0m[0mIt would fail on the following input: ~(~(_, (x: String forSome x not in "-")), _)[0m
+[0m[[0m[33mwarn[0m] [0m[0m    differenceQuery ~ "-" ~ unionQuery ^^ {[0m
+[0m[[0m[33mwarn[0m] [0m[0m                                          ^[0m
+[0m[[0m[33mwarn[0m] [0m[0mD:\PISTIS\Eris-main\RAParser.scala:195:34: match may not be exhaustive.[0m
+[0m[[0m[33mwarn[0m] [0m[0mIt would fail on the following input: ~(~(_, (x: String forSome x not in ":=")), _)[0m
+[0m[[0m[33mwarn[0m] [0m[0m    identifier ~ ":=" ~ query ^^ {[0m
+[0m[[0m[33mwarn[0m] [0m[0m                                 ^[0m
+[0m[[0m[33mwarn[0m] [0m[0mD:\PISTIS\Eris-main\combineQuery.scala:65:60: unreachable code[0m
+[0m[[0m[33mwarn[0m] [0m[0m      case Derivation(q, List((f, Times(Var(a), Num(c))))) =>[0m
+[0m[[0m[33mwarn[0m] [0m[0m                                                           ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m6 deprecations[0m
+[0m[[0m[33mwarn[0m] [0m[0m4 deprecations (since 16.0.0-R23)[0m
+[0m[[0m[33mwarn[0m] [0m[0m11 deprecations (since 2.13.0)[0m
+[0m[[0m[33mwarn[0m] [0m[0m15 deprecations (since 2.13.3)[0m
+[0m[[0m[33mwarn[0m] [0m[0m36 deprecations in total; re-run with -deprecation for details[0m
+[0m[[0m[33mwarn[0m] [0m[0m19 warnings found[0m

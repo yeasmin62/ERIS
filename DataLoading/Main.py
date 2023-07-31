@@ -18,35 +18,39 @@ def database_connection(config_file_name):
             key, value = line.strip().split('=')
             connection_info[key] = value
 
-    connection_string = f"postgresql://{connection_info['user']}:{connection_info['password']}@{connection_info['host']}:{connection_info['port']}/{connection_info['database']}"
-    engine = create_engine(connection_string)
-    conn = engine.connect()
+    conn = psycopg2.connect(
+        database=connection_info['database'],
+        user=connection_info['user'],
+        password=connection_info['password'],
+        host=connection_info['host'],
+        port=connection_info['port']
+    )
 
     conn.autocommit = True
-    # cursor = conn.cursor()
+    cursor = conn.cursor()
 
-    return conn, connection_info
+    return conn,cursor, connection_info
 
 
 if __name__ == "__main__":
 
 
-    conn,connection_info = database_connection(config_file_name='config.txt')
+    conn,cursor, connection_info = database_connection(config_file_name='config.txt')
     # print(conn)
 
     # calling database creation function
-    create_tables.table_creation(conn)
+    create_tables.table_creation(cursor)
 
 
     #calling schema Insertion function
-    schema_insertion.schemaInsert(conn)
+    schema_insertion.schemaInsert(cursor)
 
 
     # calling loading dimension function
     load_dimensions.load_dim(connection_info)
 
     # calling dimension contstrains function
-    constraints_of_dimensions.dim_constraints(conn)
+    constraints_of_dimensions.dim_constraints(cursor)
 
     # calling the analyze dimension tables function
     analyze_table.analyze_dimension_tables(connection_info)
@@ -72,7 +76,7 @@ if __name__ == "__main__":
     print(f"Time to insert into pathfinder = {run_time_path}s")
     
     # calling fact tables constraints function
-    constraints_of_facts.fact_constraints(conn)
+    constraints_of_facts.fact_constraints(cursor)
 
     # calling the analyze fact tables function
     analyze_table.analyze_fact_tables(connection_info)
