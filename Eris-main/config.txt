@@ -1,4 +1,4 @@
 localhost
-eristest
+Sample
 postgres
 31766

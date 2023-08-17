@@ -1,0 +1,5 @@
+[0m[[0m[0mdebug[0m] [0m[0m> Exec(runMain GuiNew, Some(eb2032c2-3082-45e4-9663-9fb35c747c6f), Some(CommandSource(console0)))[0m
+[0m[[0m[0mdebug[0m] [0m[0mEvaluating tasks: Compile / runMain[0m
+[0m[[0m[0mdebug[0m] [0m[0mRunning task... Cancel: Signal, check cycles: false, forcegc: true[0m
+[0m[[0m[0minfo[0m] [0m[0mcompiling 2 Scala sources to D:\PISTIS\Eris-main\target\scala-2.13\classes ...[0m
+[0m[[0m[0minfo[0m] [0m[0mshutting down sbt server[0m

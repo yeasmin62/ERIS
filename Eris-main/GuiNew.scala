@@ -23,6 +23,7 @@ import java.awt.Insets
 import scalafx.geometry
 import scala.collection.mutable.HashMap
 import scalafx.scene.text.FontWeight
+import scala.io.Source
 
 object GuiNew extends JFXApp {
   var scene1: Scene = null
@@ -61,14 +62,26 @@ object GuiNew extends JFXApp {
     // print("ctx1" + ctx1)
 
     val tabpane = new TabPane()
-    val tab1 = new Tab()
-    tab1.text = "General"
-    val tab2 = new Tab()
-    tab2.text = "Grund Truth"
-    val tab3 = new Tab()
-    tab3.text = "Query Input"
-    val tab4 = new Tab()
-    tab4.text = "Help"
+    val tab1 = new Tab(){
+      closable = false
+      text = "General"
+    }
+    val tab2 = new Tab(){
+      text = "Grund Truth"
+      closable = false
+      disable = true
+
+    }
+    val tab3 = new Tab(){
+      text = "Query Input"
+      closable = false
+      disable = true
+    }
+    val tab4 = new Tab(){
+      text = "Help"
+      closable = false
+    }
+
 
     ////////// Tab 1 /////////////
     val label = new Label("Which Encoding would you prefer?")
@@ -199,6 +212,8 @@ object GuiNew extends JFXApp {
             new Thread(loadingTask).start()
           }
         }
+      tab2.disable = false
+      tabpane.selectionModel().select(tab2)
 
       }
     }
@@ -206,7 +221,7 @@ object GuiNew extends JFXApp {
     loadbtn.alignment = Center
 
     ////////// Tab 3 /////////////
-    val InputArea = new TextArea
+    var InputArea = new TextArea
     InputArea.prefHeight = 200
     InputArea.prefWidth = 280
     InputArea.promptText =
@@ -426,6 +441,8 @@ object GuiNew extends JFXApp {
         }
 
         new Thread(loadingTask).start()
+        tab3.disable = false
+        tabpane.selectionModel().select(tab3)
       }
     }
 
@@ -457,6 +474,11 @@ object GuiNew extends JFXApp {
       onAction = (e: ActionEvent) => {
         val filechooser = new FileChooser
         val selectedfile = filechooser.showOpenDialog(stage)
+        if (selectedfile != null) {
+          val source = scala.io.Source.fromFile(selectedfile)
+          val fileContent = try source.getLines.mkString("\n") finally source.close()
+          InputArea.text = fileContent
+        }
         input_text = selectedfile.toString()
         val filename = input_text.split('\\')
         filelabel.text = filename(filename.length - 1).capitalize

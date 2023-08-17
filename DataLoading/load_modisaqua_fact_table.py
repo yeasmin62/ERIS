@@ -4,6 +4,7 @@ import netCDF4 as nc4
 import pandas as pd
 from sqlalchemy import create_engine
 import numpy as np
+from time import time
 
 def generate_keys(lat,lon):
     # Handle rounding differently for positive and negative values
@@ -37,7 +38,8 @@ def process_file(args):
     nc.close()
 
 
-def load_modsaqua(connection_info):
+def load_modisaqua(connection_info):
+    start_time = time()
 
     path_cd = r'Data\modisaqua'
     cd_files = sorted(os.listdir(path_cd))
@@ -58,8 +60,8 @@ def load_modsaqua(connection_info):
     point_lat = pd.read_csv(r'Dimensioncsv/medi_lat.csv')
     point_lon = pd.read_csv(r'Dimensioncsv/medi_lon.csv')
 
-    points_lat = point_lat['lat'][:].to_numpy()
-    points_lon = point_lon['lon'][:].to_numpy()
+    points_lat = point_lat['lat'][:100].to_numpy()
+    points_lon = point_lon['lon'][:100].to_numpy()
 
     # Create a grid of points
     grid_lat, grid_lon = np.meshgrid(points_lat, points_lon)
@@ -83,3 +85,7 @@ def load_modsaqua(connection_info):
     connection_string = f"postgresql://{connection_info['user']}:{connection_info['password']}@{connection_info['host']}:{connection_info['port']}/{connection_info['database']}"
     with Pool() as pool:
         pool.map(process_file, [(file, path_cd, index_cd, points, dict, connection_string) for file in cd_files])
+
+    end_time = time()
+
+    return end_time - start_time

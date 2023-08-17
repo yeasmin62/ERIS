@@ -68,7 +68,7 @@ if __name__ == "__main__":
     print(f'loading time is {run_time_copernicus}s')
 
     print('Loading data into modisaqua table\n')
-    run_time_modis = load_modisaqua_fact_table.load_modsaqua(connection_info)
+    run_time_modis = load_modisaqua_fact_table.load_modisaqua(connection_info)
     print(f'Loading time {run_time_modis}')
     
     print('Loading data into pathfinder table\n')

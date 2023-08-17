@@ -7,23 +7,10 @@ object Main {
     val connector = Connector(args(0), args(1), args(2), args(3))
    var input_text = """
 
-t1:=(climate_temperature);
-t2:=(t1 JOIN semiday{id->date});
-t3:=(t2(dateofsemiday = '20200131'));
-t4:=((t3{counter:=1})[dateofsemiday,latitude,longitude SUM sea_surface_temperature,counter]);
-t5:=((t4{sst:=sea_surface_temperature/counter}){latitude->degree005});
-t6:=((t5 JOIN resolution005){degree005->la});
-t7:=(((t6{degree020->latitude}){longitude->degree005}) JOIN resolution005{degree020->longitude});
-t8:=((t7{counter1:=1})[latitude,longitude SUM sst, counter1]);
-t9:=(t8{avg_sst:= sst/counter1})[avg_sst];
-t10:=(copernicus_temperature{date->dateofsemiday} JOIN semiday);
-t11:=(t10(dateofsemiday='20200131'));
-t12:=((t11{latitude->degree005}) JOIN resolution005);
-t13:=((t12{degree005->la}){degree020->latitude});
-t14:=((t13{longitude->degree005}) JOIN (resolution005{degree020->longitude}));
-t15:=((t14{counter:=1})[latitude,longitude SUM sea_surface_temperature, counter]);
-t16:=(t15{avg_sst:=sea_surface_temperature/counter})[avg_sst];
-t17:=(t9 DUNION[src] t16)[COAL src]
+t1:=(copernicus_temperature(date = '20200101'));
+t2:=((t1{counter:=1})[date SUM sea_surface_temperature,counter]);
+t3:=(t2{avg_sst:=sea_surface_temperature/counter})[avg_sst]
+
 
       
          """
@@ -86,8 +73,8 @@ t17:=(t9 DUNION[src] t16)[COAL src]
         val schema0 = Absyn.Query.tc(enc_schema, q0)
         val schema0vc = Absyn.Query.tc(enc_schema, q0vc)
         println("----->>>>>>> Query encoding schema")
-        println(schema0)
-        println(schema0vc)
+        // println(schema0)
+        // println(schema0vc)
         val sql0 = Absyn.Query.sql(q0)
         val sql0vc = Absyn.Query.sql(q0vc)
         println("----->>>>>>> Query encoding SQL")
@@ -96,12 +83,12 @@ t17:=(t9 DUNION[src] t16)[COAL src]
         println("========")
         println("Base result:")
         val result0 = getQuery(q0)
-        println(result0)
+        // println(result0)
         println("========")
         println("========")
         println("Base result VC:")
         val result0vc = getQuery(q0vc)
-        println(result0vc)
+        // println(result0vc)
         println("========")
         val (valuation,objective,eqs,vars,eqCreationTime,solveTime) = VirtualSolverAAE.solve1(connector, q, encoding, false)
         println(s";$eqs;$vars;"+eqCreationTime+";"+solveTime+";"+objective)

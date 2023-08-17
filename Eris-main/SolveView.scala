@@ -35,7 +35,14 @@ object  SolveView {
     var spec: List[(String,Absyn.Query)] = List()
     //println(" line number " + line)
     //flag is used to differentiate between the inputs from covid file and other file
-    spec = p.parse(p.specification, specfile, vlist)
+    if (specfile.contains("spec"))
+    {
+      spec = p.parse(p.specification, specfile, vlist)
+      // print(specfile)
+    } else {
+      spec = p.parseStr(p.specification, specfile)
+      // print(specfile)
+    }
     //println("Spec " + spec)
     var spec1: List[(Absyn.Query)] = List()
     var result:(List[(String,Double)],Double,Int,Int,Double,Double) = (List(),0,0,0,0,0)
@@ -90,8 +97,10 @@ object  SolveView {
     if (specfile.contains("spec"))
     {
       spec = p.parse(p.specification, specfile, vlist)
+      print(specfile)
     } else {
       spec = p.parseStr(p.specification, specfile)
+      // print(specfile)
     }
     //println("Spec " + spec)
     var spec1: List[(Absyn.Query)] = List()
