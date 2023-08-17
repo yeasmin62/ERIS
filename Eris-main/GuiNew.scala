@@ -107,7 +107,7 @@ object GuiNew extends JFXApp {
         flagV = "true"
       }
     }
-    val rbn4 = new RadioButton("V.(1+X)") {
+    val rbn4 = new RadioButton("V*(1+X)") {
       onAction = (e: ActionEvent) => {
         flagV = "false"
       }

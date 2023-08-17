@@ -27,3 +27,4 @@
 1692300793403:runMain GuiNew
 1692301016973:runMain Main localhost Sample postgres partitioning
 1692301036706:runMain Main localhost Sample postgres 31766 partitioning
+1692302779313:runMain Main localhost Sample postgres 31766 nf2_sparsev

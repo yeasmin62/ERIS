@@ -975,3 +975,57 @@ WARNING: Unmatched cancel notification for request id 508
 2023.08.17 21:17:20 INFO  Shut down connection with build server.
 2023.08.17 21:17:20 INFO  Shut down connection with build server.
 2023.08.17 21:17:20 INFO  Exiting server
+2023.08.17 21:36:12 INFO  Started: Metals version 1.0.0 in folders 'D:\PISTIS\Eris-main' for client Visual Studio Code 1.81.1.
+Aug 17, 2023 9:36:12 PM org.flywaydb.core.internal.license.VersionPrinter printVersionOnly
+INFO: Flyway Community Edition 9.20.1 by Redgate
+Aug 17, 2023 9:36:12 PM org.flywaydb.core.internal.license.VersionPrinter printVersion
+INFO: See release notes here: https://rd.gt/416ObMi
+Aug 17, 2023 9:36:12 PM org.flywaydb.core.internal.license.VersionPrinter printVersion
+INFO: 
+Aug 17, 2023 9:36:12 PM org.flywaydb.core.internal.database.base.BaseDatabaseType createDatabase
+INFO: Database: jdbc:h2:file:D:\PISTIS\Eris-main\.metals\metals (H2 2.1)
+Aug 17, 2023 9:36:12 PM org.flywaydb.core.internal.command.DbValidate validate
+INFO: Successfully validated 4 migrations (execution time 00:00.025s)
+Aug 17, 2023 9:36:12 PM org.flywaydb.core.internal.command.DbMigrate migrateGroup
+INFO: Current version of schema "PUBLIC": 4
+Aug 17, 2023 9:36:12 PM org.flywaydb.core.internal.command.DbMigrate logSummary
+INFO: Schema "PUBLIC" is up to date. No migration necessary.
+2023.08.17 21:36:12 INFO  time: initialize in 0.71s
+2023.08.17 21:36:14 INFO  Attempting to connect to the build server...
+2023.08.17 21:36:14 INFO  Bloop uses C:\Program Files\Java\jdk-11.0.13 defined at C:\Users\Yeasmin\.bloop\bloop.json
+2023.08.17 21:36:14 INFO  skipping build import with status 'Installed'
+2023.08.17 21:36:14 INFO  tracing is disabled for protocol BSP, to enable tracing of incoming and outgoing JSON messages create an empty file at D:\PISTIS\Eris-main\.metals\bsp.trace.json or C:\Users\Yeasmin\AppData\Local\scalameta\metals\cache\bsp.trace.json
+2023.08.17 21:36:14 INFO  Attempting to connect to the build server...
+2023.08.17 21:36:14 INFO  Bloop uses C:\Program Files\Java\jdk-11.0.13 defined at C:\Users\Yeasmin\.bloop\bloop.json
+2023.08.17 21:36:14 INFO  tracing is disabled for protocol BSP, to enable tracing of incoming and outgoing JSON messages create an empty file at D:\PISTIS\Eris-main\project\.metals\bsp.trace.json or C:\Users\Yeasmin\AppData\Local\scalameta\metals\cache\bsp.trace.json
+2023.08.17 21:36:14 INFO  time: Connected to build server in 0.43s
+2023.08.17 21:36:14 INFO  Connected to Build server: Bloop v1.5.8
+2023.08.17 21:36:18 INFO  no build target found for D:\PISTIS\Eris-main\Main.scala. Using presentation compiler with project's scala-library version: 3.3.0
+2023.08.17 21:36:18 INFO  time: code lens generation in 3.98s
+2023.08.17 21:36:18 INFO  time: Imported build in 0.1s
+2023.08.17 21:36:24 INFO  time: indexed workspace in 5.53s
+2023.08.17 21:36:29 INFO  compiling eris-main-test (4 scala sources)
+2023.08.17 21:36:30 WARN  1 deprecation (since 16.0.0-R23)
+2023.08.17 21:36:30 WARN  3 deprecations (since 2.13.3)
+2023.08.17 21:36:30 WARN  4 deprecations in total; re-run with -deprecation for details
+2023.08.17 21:36:30 INFO  time: compiled eris-main-test in 2s
+2023.08.17 21:36:34 INFO  skipping build import with status 'Installed'
+2023.08.17 21:37:25 INFO  compiling eris-main (1 scala source)
+2023.08.17 21:37:25 INFO  time: compiled eris-main in 0.67s
+2023.08.17 21:37:32 INFO  skipping build import with status 'Installed'
+2023.08.17 21:37:32 INFO  compiling eris-main (1 scala source)
+2023.08.17 21:37:33 INFO  time: compiled eris-main in 1.21s
+2023.08.17 21:41:28 INFO  skipping build import with status 'Installed'
+2023.08.17 21:41:28 INFO  compiling eris-main (1 scala source)
+2023.08.17 21:41:28 INFO  time: compiled eris-main in 0.64s
+2023.08.17 22:15:03 INFO  skipping build import with status 'Installed'
+2023.08.17 22:15:03 INFO  compiling eris-main (1 scala source)
+2023.08.17 22:15:05 WARN  1 deprecation (since 16.0.0-R23)
+2023.08.17 22:15:05 WARN  3 deprecations (since 2.13.3)
+2023.08.17 22:15:05 WARN  4 deprecations in total; re-run with -deprecation for details
+2023.08.17 22:15:05 INFO  time: compiled eris-main in 1.64s
+2023.08.17 22:15:14 INFO  Shutting down server
+2023.08.17 22:15:14 INFO  shutting down Metals
+2023.08.17 22:15:14 INFO  Shut down connection with build server.
+2023.08.17 22:15:14 INFO  Shut down connection with build server.
+2023.08.17 22:15:14 INFO  Exiting server

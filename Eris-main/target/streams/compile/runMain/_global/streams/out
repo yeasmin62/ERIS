@@ -1,15 +1,16 @@
-[0m[[0m[31merror[0m] [0m[0morg.postgresql.util.PSQLException: FATAL: password authentication failed for user "postgres"[0m
-[0m[[0m[31merror[0m] [0m[0m	at org.postgresql.core.v3.ConnectionFactoryImpl.doAuthentication(ConnectionFactoryImpl.java:623)[0m
-[0m[[0m[31merror[0m] [0m[0m	at org.postgresql.core.v3.ConnectionFactoryImpl.tryConnect(ConnectionFactoryImpl.java:163)[0m
-[0m[[0m[31merror[0m] [0m[0m	at org.postgresql.core.v3.ConnectionFactoryImpl.openConnectionImpl(ConnectionFactoryImpl.java:215)[0m
-[0m[[0m[31merror[0m] [0m[0m	at org.postgresql.core.ConnectionFactory.openConnection(ConnectionFactory.java:51)[0m
-[0m[[0m[31merror[0m] [0m[0m	at org.postgresql.jdbc.PgConnection.<init>(PgConnection.java:225)[0m
-[0m[[0m[31merror[0m] [0m[0m	at org.postgresql.Driver.makeConnection(Driver.java:466)[0m
-[0m[[0m[31merror[0m] [0m[0m	at org.postgresql.Driver.connect(Driver.java:265)[0m
-[0m[[0m[31merror[0m] [0m[0m	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:677)[0m
-[0m[[0m[31merror[0m] [0m[0m	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:228)[0m
-[0m[[0m[31merror[0m] [0m[0m	at Connector.getConnection(Connector.scala:11)[0m
-[0m[[0m[31merror[0m] [0m[0m	at Main$.main(Main.scala:16)[0m
+[0m[[0m[31merror[0m] [0m[0morg.postgresql.util.PSQLException: ERROR: operator does not exist: sparsevec * numeric[0m
+[0m[[0m[31merror[0m] [0m[0m  Hint: No operator matches the given name and argument types. You might need to add explicit type casts.[0m
+[0m[[0m[31merror[0m] [0m[0m  Position: 95[0m
+[0m[[0m[31merror[0m] [0m[0m	at org.postgresql.core.v3.QueryExecutorImpl.receiveErrorResponse(QueryExecutorImpl.java:2674)[0m
+[0m[[0m[31merror[0m] [0m[0m	at org.postgresql.core.v3.QueryExecutorImpl.processResults(QueryExecutorImpl.java:2364)[0m
+[0m[[0m[31merror[0m] [0m[0m	at org.postgresql.core.v3.QueryExecutorImpl.execute(QueryExecutorImpl.java:354)[0m
+[0m[[0m[31merror[0m] [0m[0m	at org.postgresql.jdbc.PgStatement.executeInternal(PgStatement.java:484)[0m
+[0m[[0m[31merror[0m] [0m[0m	at org.postgresql.jdbc.PgStatement.execute(PgStatement.java:404)[0m
+[0m[[0m[31merror[0m] [0m[0m	at org.postgresql.jdbc.PgPreparedStatement.executeWithFlags(PgPreparedStatement.java:162)[0m
+[0m[[0m[31merror[0m] [0m[0m	at org.postgresql.jdbc.PgPreparedStatement.executeQuery(PgPreparedStatement.java:114)[0m
+[0m[[0m[31merror[0m] [0m[0m	at Database$.streamQuery(Database.scala:109)[0m
+[0m[[0m[31merror[0m] [0m[0m	at Main$.getQuery$1(Main.scala:31)[0m
+[0m[[0m[31merror[0m] [0m[0m	at Main$.main(Main.scala:85)[0m
 [0m[[0m[31merror[0m] [0m[0m	at Main.main(Main.scala)[0m
 [0m[[0m[31merror[0m] [0m[0m	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)[0m
 [0m[[0m[31merror[0m] [0m[0m	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)[0m
@@ -28,4 +29,6 @@
 [0m[[0m[31merror[0m] [0m[0m	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)[0m
 [0m[[0m[31merror[0m] [0m[0m	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)[0m
 [0m[[0m[31merror[0m] [0m[0m	at java.base/java.lang.Thread.run(Thread.java:834)[0m
-[0m[[0m[31merror[0m] [0m[0m(Compile / [31mrunMain[0m) org.postgresql.util.PSQLException: FATAL: password authentication failed for user "postgres"[0m
+[0m[[0m[31merror[0m] [0m[0m(Compile / [31mrunMain[0m) org.postgresql.util.PSQLException: ERROR: operator does not exist: sparsevec * numeric[0m
+[0m[[0m[31merror[0m] [0m[0m  Hint: No operator matches the given name and argument types. You might need to add explicit type casts.[0m
+[0m[[0m[31merror[0m] [0m[0m  Position: 95[0m
