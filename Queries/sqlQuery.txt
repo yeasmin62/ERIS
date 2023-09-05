@@ -1,0 +1,10 @@
+t1:=(climate_temperature);
+t2:=(t1 JOIN semiday{id->date});
+t3:=(t2(dateofsemiday = '20200101'));
+t4:=((t3{counter:=1})[dateofsemiday,latitude,longitude SUM sea_surface_temperature,counter]);
+t5:=((t4{sst:=sea_surface_temperature/counter})
+
+SELECT sd.dateofsemiday, ct.latitude,ct.longitude, AVG(sea_surface_temperature) 
+FROM climate_temperature ct JOIN semiday sd ON sd.id = ct.date
+where sd.dateofsemiday = '20200101'
+group by sd.dateofsemiday, ct.latitude,ct.longitude

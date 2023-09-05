@@ -1,6 +1,6 @@
 import scalafx.Includes._
 import scalafx.scene.layout._
-import scalafx.scene.control.{Button, Tab, TabPane}
+import scalafx.scene.control.{Button, Tab, TabPane, Label}
 import scalafx.geometry.HPos
 import scalafx.geometry.Pos.Center
 class EquationConversion {
@@ -18,6 +18,20 @@ class EquationConversion {
       home.setOnAction(_ => goToScene1())
       home
     }
+
+    def LabelCompleted(): (Label,Label) = {
+      val completed = new Label("Completed!")
+      {
+        visible = false
+      }
+      val loadingLabel = new Label("Loading....")
+      {
+        visible = false
+      }
+
+      (loadingLabel,completed)
+    }
+
 
     def queryconvert(q:String):String = {
       val convertedq = q.toString().replaceAll("\\(","\n\\(")

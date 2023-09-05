@@ -78,8 +78,16 @@ object EncodePartitioning extends Encoding {
       s"CASE WHEN $attName IS NULL THEN 0.0::double precision ELSE $attName::double precision END"
     def DBNewVar(tableName: String, attName: String, pk: String) =
       s"(CASE WHEN $attName IS NULL then '_' else '' end) || '$tableName'||'_'||'$attName'||'_'||row_number() over (order by $pk)::text"
-    def DBNewCoeff(attName: String) = s"(case when $attName IS NULL OR $attName=0 then 1.0 else $attName end)::double precision"
-
+    def DBNewCoeff(attName: String) = {
+      if(flagV) //I added this part for V+X encoding
+      {
+        s"(case when $attName IS NULL OR $attName=0 then 1.0 else 1.0 end)::double precision"
+      }
+      else{
+        s"(case when $attName IS NULL OR $attName=0 then 1.0 else $attName end)::double precision"
+      }
+      
+    }
     // this is the key of the original table
     val pk = sch.keyFields.filterNot(_=="_var_").mkString(",")
     val keyFields = sch.keyFields.filterNot(_=="_var_").map{f => (f,f+"::text")}
@@ -187,18 +195,18 @@ object EncodePartitioning extends Encoding {
                 UnionAll(qm(a),qm(b)),
                 schema.keyFields.toList,schema.valFields.toList))),
           vc)
+      // this part is added by me for the operatio of summation of a variable and number
+
       case Derivation(q,List((f,Plus(Var(a),Num(c))))) =>
         
         val (q0,qm,vc) = queryEncoding(q)
-        // print("DerivationACqm\n" + qm)
         val q_empty = Emptyset
-        q_empty.schema = fieldSchema(q.schema)
-        // print("schema" + schema)
+        val schema = fieldSchema(q.schema)
         if(q.schema.varfreeFields.contains(a)){
           (Derivation(q0,List((f,Plus(Var(a),Num(c))))),qm + {f->Emptyset},vc)
         }
         else {
-          (Derivation(q0,List((f,Plus(Var(a),Num(c))))),qm + {f-> q_empty} ,vc)
+          (Derivation(q0,List((f,Plus(Var(a),Num(c))))),qm + {f->Emptyset},vc)
 
         }
         

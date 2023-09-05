@@ -32,16 +32,14 @@ def process_file(args):
 
     filename, dict, connection_string, time_chunk = args
     nc = nc4.Dataset(filename, 'r', Format='NETCDF4')  # Open the dataset in the process
-    lats = nc.variables['lat'][:50]
-    lons = nc.variables['lon'][:50]
+    lats = nc.variables['lat'][:200]
+    lons = nc.variables['lon'][:200]
     times = nc.variables['time'][time_chunk]
     units = nc.variables['time'].units
-    data_list = []
-    batch_size = 10000  # Adjust batch size as per your requirement
-    pid = os.getpid()  # Get current process ID
-    temp_table_name = f"temp_table_{pid}"  # Create a unique temp table name for this process
-
+    
+    
     for time_index, time in enumerate(times):
+        data_list = []
         t = num2date(time, units=units, calendar='365_day')
         t -= timedelta(days=9)
         c = str(t.year) + date_info(t.month) + date_info(t.day)

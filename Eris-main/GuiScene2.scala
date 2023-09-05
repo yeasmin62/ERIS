@@ -31,8 +31,8 @@ object GuiScene2 extends JFXApp {
       flag_null:Boolean,
       goToScene1: () => Unit): Scene = {
     val tabpane = new TabPane()
-    val tab1 = new Tab()
-    tab1.text = "Encoded Query" //Result Schema"
+    // val tab1 = new Tab()
+    // tab1.text = "Encoded Query" //Result Schema"
     val tab2 = new Tab()
     tab2.text = "Encoded SQL Query" //Query Encoding"
     val tab3 = new Tab()
@@ -55,30 +55,30 @@ object GuiScene2 extends JFXApp {
  
     // tasks for tab 1
     // print(q0)
-    val tab1lbl1 = new Label(ueq.queryconvert(q0.toString()))
-    val tab1lbl2 = new Label(ueq.queryconvert(q0vc.toString()))
-    lazy val tab1vbox = new VBox()
-    {
-      spacing = 30
-      padding = Insets(0,0,0,30)
-      alignment = Center
-      prefHeight = 290
-      prefWidth = 290
-    }
-    val tab1border = new BorderPane{
-      top = tab1lbl1
-      center = tab1lbl2
-      prefHeight = 290
-    }
-    val tab1scroll = new ScrollPane
-    tab1scroll.content = tab1border
-    tab1vbox.children.append(tab1scroll)
-    tab1vbox.children.append(ueq.button(goToScene1))
-    tab1vbox.alignment = Center
+    // val tab1lbl1 = new Label(ueq.queryconvert(q0.toString()))
+    // val tab1lbl2 = new Label(ueq.queryconvert(q0vc.toString()))
+    // lazy val tab1vbox = new VBox()
+    // {
+    //   spacing = 30
+    //   padding = Insets(0,0,0,30)
+    //   alignment = Center
+    //   prefHeight = 290
+    //   prefWidth = 290
+    // }
+    // val tab1border = new BorderPane{
+    //   top = tab1lbl1
+    //   center = tab1lbl2
+    //   prefHeight = 290
+    // }
+    // // val tab1scroll = new ScrollPane
+    // tab1scroll.content = tab1border
+    // tab1vbox.children.append(tab1scroll)
+    // tab1vbox.children.append(ueq.button(goToScene1))
+    // tab1vbox.alignment = Center
     // tab2vbox.children = List(new Pane{prefHeight=10},tab2lbl1, tab2lbl2, ueq.button(goToScene1))
     // val tab2scroll = new ScrollPane
     // tab2scroll.content = tab2vbox
-    tab1.content = tab1vbox
+    // tab1.content = tab1vbox
 
 
     //tasks for tab2
@@ -225,7 +225,7 @@ object GuiScene2 extends JFXApp {
     tab5.content = tab5vbox
 
     //////// TABPANE /////////
-    tabpane.tabs = List(tab1, tab2, tab3, tab4,tab5)
+    tabpane.tabs = List(tab2, tab3, tab4,tab5)
 
     new Scene(400, 400) {
       fill = Color.LightGray

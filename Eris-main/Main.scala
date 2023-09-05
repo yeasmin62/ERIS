@@ -6,10 +6,31 @@ object Main {
   def main(args:Array[String]) : Unit = {
     val connector = Connector(args(0), args(1), args(2), args(3))
    var input_text = """
+// t1:=(climate_temperature(date = '20200101D'));
+// t2:=((t1{counter:=1})[latitude,longitude SUM sea_surface_temperature,counter]);
+// t3:=(t2{avg_sst:=sea_surface_temperature/counter})[avg_sst];
+// t4:=(copernicus_temperature(date = '20200101'));
+// t5:=((t4{counter:=1})[latitude,longitude SUM sea_surface_temperature,counter]);
+// t6:=(t5{avg_sst:=sea_surface_temperature/counter})[avg_sst];
+// t7:= (t3 DUNION[src] t6)[COAL src]
 
-t1:=(copernicus_temperature(date = '20200101'));
-t2:=((t1{counter:=1})[date SUM sea_surface_temperature,counter]);
-t3:=(t2{avg_sst:=sea_surface_temperature/counter})[avg_sst]
+t1:=(climate_temperature);
+t2:=(t1 JOIN semiday{id->date});
+t3:=(t2(dateofsemiday = '20200101'));
+t4:=((t3{counter:=1})[dateofsemiday,latitude,longitude SUM sea_surface_temperature,counter]);
+t5:=((t4{sst:=sea_surface_temperature/counter}){latitude->degree005});
+t6:=((t5 JOIN resolution005){degree005->la});
+t7:=(((t6{degree020->latitude}){longitude->degree005}) JOIN resolution005{degree020->longitude});
+t8:=((t7{counter1:=1})[latitude,longitude SUM sst, counter1]);
+t9:=(t8{avg_sst:= sst/counter1})[avg_sst];
+t11:=(modisaqua_temperature(date = '20200101'));
+t12:=(t11{sst:=sea_surface_temperature+273.15});
+t13:=((t12{latitude->degree004}) JOIN resolution004);
+t14:=((t13{degree004->la}){degree020->latitude});
+t15:=((t14{longitude->degree004}) JOIN (resolution004{degree020->longitude}));
+t16:=((t15{counter:=1})[latitude,longitude SUM sst, counter]);
+t17:=(t16{avg_sst:=sst/counter})[avg_sst];
+t18:=(t9 DUNION[src] t17)[COAL src]
 
 
       
@@ -67,9 +88,9 @@ t3:=(t2{avg_sst:=sea_surface_temperature/counter})[avg_sst]
         }
         
         println("----->>>> Query encoding")
-        println(q0)
-        println(q0vc)
-        println(enc_schema)
+        // println(q0)
+        // println(q0vc)
+        // println(enc_schema)
         val schema0 = Absyn.Query.tc(enc_schema, q0)
         val schema0vc = Absyn.Query.tc(enc_schema, q0vc)
         println("----->>>>>>> Query encoding schema")
@@ -78,8 +99,8 @@ t3:=(t2{avg_sst:=sea_surface_temperature/counter})[avg_sst]
         val sql0 = Absyn.Query.sql(q0)
         val sql0vc = Absyn.Query.sql(q0vc)
         println("----->>>>>>> Query encoding SQL")
-        println(sql0)
-        println(sql0vc)
+        // println(sql0)
+        // println(sql0vc)
         println("========")
         println("Base result:")
         val result0 = getQuery(q0)
@@ -90,7 +111,7 @@ t3:=(t2{avg_sst:=sea_surface_temperature/counter})[avg_sst]
         val result0vc = getQuery(q0vc)
         // println(result0vc)
         println("========")
-        val (valuation,objective,eqs,vars,eqCreationTime,solveTime) = VirtualSolverAAE.solve1(connector, q, encoding, false)
+        val (valuation,objective,eqs,vars,eqCreationTime,solveTime) = VirtualSolver1.solve1(connector, q, encoding, false)
         println(s";$eqs;$vars;"+eqCreationTime+";"+solveTime+";"+objective)
       } catch {
         case Absyn.TypeError(msg) => println("Type error: " + msg)

@@ -20,18 +20,19 @@ object Database {
 
   type InstanceSchema = Map[String,Schema]
 
+
+
   def loadSchema(conn: Connection) = {
     val schemaQuery = "select tablename, fieldname, key, varfree from schema;"
     val preparedStatement = conn.prepareStatement(schemaQuery)
-    //println(" Database/loadSchema/preparedStatement\n " + preparedStatement)
     val result = streamQuery(preparedStatement)
-    //println(" Database/loadSchema/result\n " + result)
-    //println(schemaOfResult(result))
     schemaOfResult(result)
   }
+  
+  
+  // This one is created to get the key values to generate the value field options in the Gui Tab 2 
 
-
-  def loadSchema_for_gui(conn: Connection) = {
+   def loadSchema_for_gui(conn: Connection) = {
     val schemaQuery = "select tablename, fieldname, key, varfree from schema;"
     val preparedStatement = conn.prepareStatement(schemaQuery)
     //println(" Database/loadSchema/preparedStatement\n " + preparedStatement)
@@ -48,7 +49,6 @@ object Database {
       val newVar = x + i
       i = i + 1
       indexVarName += (newVar->i)
-      //println("newVar" + newVar)
       newVar
     }
   }
@@ -64,7 +64,6 @@ object Database {
     q.setFetchSize(blocksize)
     val rs = q.executeQuery()
     val meta = rs.getMetaData()
-    //println("meta " + meta)
     val n = meta.getColumnCount()
     val fields = for (i <- Range(0,n,1))
                  yield (i+1, meta.getColumnName(i+1))
@@ -75,7 +74,6 @@ object Database {
           for ((i,f) <- fields)
           yield (f,{
             val x = rs.getString(i)
-            //println("some" + Some(x))
             if (rs.wasNull()) {None} else {Some(x)}
           })
         )
@@ -133,8 +131,6 @@ object Database {
       val varfree = row("varfree").get.equals("t")
       (tablename,fieldname,key,varfree)
     }
-    //println(tuples)
-
     tuples.groupMapReduce{_._1}{
       case (_,f,k,vf) =>
         if (k) {
@@ -150,10 +146,9 @@ object Database {
       case (Schema(k1,v1,f1),Schema(k2,v2,f2)) =>
         Schema(k1.union(k2), v1.union(v2), f1.union(f2))
     }
-
   }
-
-
+  
+  // This one is created to get the key values to generate the value field options in the Gui Tab 2 
   def schemaOfResult_gui(res: Result): InstanceSchema = {
     val tuples = res.map{row =>
       val tablename = row("tablename").get
@@ -184,7 +179,7 @@ object Database {
 
   // streams result into lazy list of rows, using schema
   // useful for reading result and doing something with it
-  // without materializing as an in memory relation
+  // without materializing as an inmemory relation
   def streamRelation(result: Result, schema: Schema): LazyList[Row] = {
     result.map{case row =>
       val keys = Map() ++ schema.keyFields.map{k => (k,row(k).getOrElse("!!NULL!!"))}
@@ -215,7 +210,6 @@ object Database {
           case None => (k,Absyn.NullV)
         }
       }
-      //println("keys vals" + keys + vals)
       (keys,vals)
     }
   }
@@ -250,7 +244,6 @@ object Database {
           case None => (k,Absyn.NullV)
         }
       }
-      //println(" vals" + vals)
       (keys,vals)
     }
   }
@@ -279,7 +272,6 @@ object Database {
   def insertRowCommand(r: String, row: Row): String = {
     val keyFields = row._1.keySet.toList
     val valFields = row._2.keySet.toList
-    //println("valfields " + valFields)
     val fieldnames = "(" + (keyFields ++ valFields).mkString(",") + ")"
     val values = "(" + (keyFields.map{x => "'"+escape(row._1(x))+"'"} ++ valFields.map{x => row._2(x).toString}).mkString(",") + ")"
     raw"""INSERT INTO $r $fieldnames VALUES $values;""" 
@@ -303,7 +295,6 @@ object Database {
   // field order consistency is weirdly important here
   def insertQueryCommand(r: String, q: Query): String = {
     val q_sql = Absyn.Query.sql(q)
-    //println(" Database/insertQueryCommand/q_sql " + q_sql)
     val fieldnames = "(" + (q.schema.keyFields.toList ++ q.schema.valFields.toList).mkString(",") + ")"
     raw"""INSERT INTO $r $fieldnames ($q_sql);"""
   }
@@ -328,23 +319,10 @@ CREATE TABLE $r
 );
 """
   }
-  def createTempTableCommand(r: String, fields: Map[String,(String,Boolean)]): String = {
-    val fieldstr = fields.toList.map{
-      case (f,(ty,true)) => f + " " + ty
-      case (f,(ty,false)) => f + " " + ty + " NOT NULL"
-    }.mkString(",\n  ")
-    //println("Database/ CreatenotTableCommand/fieldstr " + fieldstr)
-    raw"""
-CREATE TABLE $r
-(
-  $fieldstr
-);
-"""
-  }
 
   // TODO: the 'empty' flag indicates whether the view should be forced to be empty
   // it is a hack to work around the fact that we create tables for both symbolic and varfree fields in
-  // the partitioning encoding.  We should instead not create these tables, and correctly track which fields
+  // the partitioning encoding.  We should instead not create these tables, and correctly track whcih fields
   // are varfree/symbolic when translating the queries so that only partitioning queries for symbolic
   //  fields get created
   def createViewCommand(sourcename:String, r: String, fields: Map[String,String], empty: Boolean): String = {
@@ -363,11 +341,8 @@ WHERE $test);
 
   def schemaToTableDef(sch: Schema, valFieldType: String): Map[String,(String,Boolean)] = {
     val keyFields = sch.keyFields.map{f => (f,("text",false))}
-    //println(" Database/schematotabledef/keyFields " + keyFields)
     val valFields = sch.valFields.filterNot(sch.varfreeFields.contains(_)).map(f => (f,(valFieldType, true)))
-    //println(" Database/schematotabledef/valFields " + valFields)
     val varfreeFields = sch.valFields.toList.filter(sch.varfreeFields.contains(_)).map(f => (f,("double precision",true)))
-    //println(" Database/schematotabledef/varfreeFields " + varfreeFields)
     (keyFields ++ valFields ++ varfreeFields).toMap
   }
 
@@ -386,8 +361,7 @@ WHERE $test);
   }
 
   def vecScalar[A](alpha: Double, v: Vector[A]): Vector[A] = {
-    //v.foldLeft(Map[A,Double]()){case (v,(k,x)) => v + (k -> alpha * x)}
-    v.foldLeft(Map[A,Double]()){case (v,(k,x)) => v + (k -> x)}
+    v.foldLeft(Map[A,Double]()){case (v,(k,x)) => v + (k -> alpha * x)}
   }
   object Expr {
     // tail recursive function that accumulates map across expression in a stack friendly way
@@ -416,7 +390,6 @@ WHERE $test);
     }
 
 
-
     def simplifyLinear(e: Expr): Expr = {
       val v = toVec(e)
       val b = v.getOrElse(None,0.0)
@@ -429,7 +402,6 @@ WHERE $test);
   }
   case class Equation(e1: Expr, e2: Expr) {
     override def toString = e1.toString + " = " + e2.toString
-    // print(toString)
     def fvs: Set[String] = fvsAcc(Set[String]())
     def fvsAcc(s: Set[String]) = e2.fvsAcc(e1.fvsAcc(s))
   }
@@ -440,7 +412,6 @@ WHERE $test);
     def toLPForm(eqn: Equation): (Vector[String],Double) = {
       val v = toVec(eqn)
       val b = v.getOrElse(None,0.0)
-      //println("b " + b)
       val aVec = v.collect{ case (Some(x),a) => (x, a) }
       (aVec,-b) // negate since moving to other side of equation
     }
@@ -452,7 +423,6 @@ WHERE $test);
 
     def generalizeNulls(s: Schema, r:Row):Row = r match {
       case (ks,vs) =>
-        //println("KS, VS" + ks +vs)
         (ks,
           vs.map{case(a,NullV) => if (!s.varfreeFields.contains(a)) {(a,ExprV(Var(Gensym.freshVar("_"+a))))} else {(a,NullV)}
             case(a,x) => (a,x)})
@@ -535,7 +505,6 @@ WHERE $test);
     def kappa(keys: List[String]): List[Equation] = {
       val reducedKeys = m.keySet.map{ks => (ks -- keys)}
       val keyMap = reducedKeys.map{ks => (ks,Gensym.freshVar("_L"))}.toMap
-      //println("Keymap " + keyMap)
       m.toList.flatMap{case (ks,vs) =>
         vs.toList.flatMap{case (vk,vv) =>
           vv.toExpr match {
@@ -549,7 +518,6 @@ WHERE $test);
 
     def coalesce(otherRel: Rel): List[Equation] = {
       val newField = Gensym.freshVar("field")
-      //println("Database.Relation.Colesce " + newField)
       this.dunion(otherRel,newField).kappa(List(newField))
     }
 
@@ -572,6 +540,25 @@ WHERE $test);
     val ps = conn.prepareStatement("SELECT * FROM "+s+" ORDER BY "+ keyfields)
     val stream = Database.streamQuery(ps)
     Database.getRelation(stream,sch)
+  }
+
+  case class UpdQueue(conn: java.sql.Connection, size: Int) {
+    val queue = scala.collection.mutable.Queue[String]()
+    def put(upd: String): Unit = {
+      if (queue.length >= size) {
+        flush()
+      }
+      queue.enqueue(upd)
+    }
+    def flush(): Unit = {
+      val upds = queue.dequeueAll(_ => true)
+      val st = conn.createStatement()
+      st.executeUpdate(upds.mkString(";"))
+      conn.commit()
+    }
+    def close(): Unit = {
+      flush()
+    }
   }
 
 }

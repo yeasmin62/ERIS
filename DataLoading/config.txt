@@ -1,5 +1,5 @@
 host=localhost
 port=5432
-database=Sample
+database=Satn
 user=postgres
 password=31766

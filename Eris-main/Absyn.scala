@@ -491,6 +491,8 @@ object Absyn {
         case DUnion(q1,q2,att) =>
           val schema1 = tc(ctx,q1)
           val schema2 = tc(ctx,q2)
+          // print ("DUschema1" + schema1 + "\n")
+          // print("DUschema2" + schema2 + "\n")
         //  val test = schema1.keyFields == schema2.keyFields && schema1.valFields == schema2.valFields
         //  println(test)
           assertOrError(schema1.keyFields == schema2.keyFields && schema1.valFields == schema2.valFields,

@@ -60,8 +60,8 @@ def load_modisaqua(connection_info):
     point_lat = pd.read_csv(r'Dimensioncsv/medi_lat.csv')
     point_lon = pd.read_csv(r'Dimensioncsv/medi_lon.csv')
 
-    points_lat = point_lat['lat'][:100].to_numpy()
-    points_lon = point_lon['lon'][:100].to_numpy()
+    points_lat = point_lat['lat'][:200].to_numpy()
+    points_lon = point_lon['lon'][:200].to_numpy()
 
     # Create a grid of points
     grid_lat, grid_lon = np.meshgrid(points_lat, points_lon)

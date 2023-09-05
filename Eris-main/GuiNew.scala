@@ -67,7 +67,7 @@ object GuiNew extends JFXApp {
       text = "General"
     }
     val tab2 = new Tab(){
-      text = "Grund Truth"
+      text = "Ground Truth"
       closable = false
       disable = true
 
@@ -166,13 +166,13 @@ object GuiNew extends JFXApp {
       Thread.sleep(10000)
     }
 
-    def showCompletedMessage(): Label = {
-      val com = new Label("Completed!")
-      com
-    }
+
     val progressBar = new ProgressBar {
+      // value_= (0) // set initial value to 0
       prefWidth = 200
+      progress = 0
     }
+
 
     val loadingLabel = new Label("Loading...") {
       visible = false
@@ -206,14 +206,14 @@ object GuiNew extends JFXApp {
               // loadingLabel.text = "Completed!!"
               loadingLabel.visible = false
               completed.visible = true
-              showCompletedMessage()
+              tab2.disable = false
+              tabpane.selectionModel().select(tab2)
             }
 
             new Thread(loadingTask).start()
           }
         }
-      tab2.disable = false
-      tabpane.selectionModel().select(tab2)
+      
 
       }
     }
@@ -293,19 +293,6 @@ object GuiNew extends JFXApp {
     }
     tab2vbox.children.append(new Pane { prefHeight = 20 })
 
-    tab2vbox.children.append(
-      new Label("!! Do not select if the table has only one option !!") {
-        style = "-fx-font-weight: bold;"
-      }
-    )
-    tab2vbox.children.append(new Label("OR") {
-      style = "-fx-font-weight: bold;"
-    })
-    tab2vbox.children.append(
-      new Label("!!Do not select all the options of two table together!!") {
-        style = "-fx-font-weight: bold;"
-      }
-    )
     for ((key, values) <- keyvalue) {
       val keyLabel = new Label(key)
       val checkboxes = values.split(",").map { value =>
@@ -316,8 +303,7 @@ object GuiNew extends JFXApp {
               // selectedMapping += (key -> (selectedMapping.getOrElse(key, "") + checkbox.text()))
             }
           }
-        }
-        checkbox.tooltip = new Tooltip("This checkbox can not be selected")
+        }        
         checkbox
       }
       checkboxes.foreach { checkbox =>
@@ -406,6 +392,7 @@ object GuiNew extends JFXApp {
 
     val progressBar2 = new ProgressBar {
       prefWidth = 200
+      progress = 0
     }
 
     val loadingLabel2 = new Label("Updating...") {
@@ -422,13 +409,16 @@ object GuiNew extends JFXApp {
 
     val up_schema = new Button("Update Schema") {
       onAction = (e: ActionEvent) => {
-        print("SM" + selectedMapping + "\n")
-        print(unselectedMapping)
+        // print("SM" + selectedMapping + "\n")
+        // print(unselectedMapping)
+        
         val loadingTask = createupdatingTask()
 
         loadingTask.setOnRunning { _ =>
           progressBar2.progress = -1 // Indeterminate progress
-          completed2.visible = false
+          // completed2.visible = false
+          loadingLabel3.visible = false
+          loadingLabel2.text = "Updating..."
           loadingLabel2.visible = true
 
         }
@@ -436,30 +426,76 @@ object GuiNew extends JFXApp {
         loadingTask.setOnSucceeded { _ =>
           progressBar2.progress = 1 // Completed progress
           // loadingLabel.text = "Completed!!"
-          loadingLabel2.visible = false
-          completed2.visible = true
+          
+          loadingLabel2.text = "Updating Complete!!"
+          // completed2.visible = true
+          
         }
 
         new Thread(loadingTask).start()
-        tab3.disable = false
-        tabpane.selectionModel().select(tab3)
+        
       }
     }
+    Tooltip.install(up_schema, new Tooltip("First Update schema, then Refresh Loading"))
+    var (loadingLabel3, completed3) = new EquationConversion().LabelCompleted()
+
+    val refreshbutton = new Button("Refresh Loading")
+    {
+      onAction = (e: ActionEvent) => {
+      ctx1 = Database.loadSchema(conn)
+       var alert = new GuiAlert()
+        (enc, flagV) match {
+          case ("", _) => alert.showWarning("Please select encoding")
+          case (_, "") => alert.showWarning("Please select variable")
+          case (_, _) => {
+            val loadingTask = createLoadingTask()
+            
+
+            loadingTask.setOnRunning { _ =>
+              progressBar2.progress = -1 // Indeterminate progress
+              loadingLabel2.visible = false
+              loadingLabel3.visible = true
+              loadingLabel3.text = "Loading..."
+              // completed3.visible = false
+
+            }
+
+            loadingTask.setOnSucceeded { _ =>
+              progressBar2.progress = 1 // Completed progress
+              // loadingLabel.text = "Completed!!"
+              loadingLabel3.text = "Loading Complete!!"
+              // completed3.visible = true
+              tab3.disable = false
+              tabpane.selectionModel().select(tab3)
+            }
+
+            new Thread(loadingTask).start()
+          }
+        }
+      }
+
+    }
+    Tooltip.install(refreshbutton, new Tooltip("First Update schema, then Refresh Loading"))
 
     ////////// Tab 2 /////////////
+ 
     val hnewbox = new HBox() {
-      children = Seq(up_schema)
+      spacing = 20
+      children = Seq(loadingLabel2,loadingLabel3)
     }
 
-    val hnewbox1 = new HBox() {
-      children = Seq(loadingLabel2, completed2)
+       val hnewbox1 = new HBox() {
+      spacing = 20
+      children = Seq(up_schema, refreshbutton)
     }
+
     // hnewbox.children.add(up_schema)
     // hnewbox.children.add(reset_schema)
     hnewbox.alignment = Center
+    hnewbox1.alignment = Center
     tab2vbox.children.add(progressBar2)
-    tab2vbox.children.add(hnewbox1)
     tab2vbox.children.add(hnewbox)
+    tab2vbox.children.add(hnewbox1)
 
     //////// Tab 3/////////////
     var filelabel = new Label("File Name") {
@@ -490,11 +526,11 @@ object GuiNew extends JFXApp {
     val rbn5 = new Button("RUN") {
       layoutX = 210
       layoutY = 490
+      
       onAction = (e: ActionEvent) => {
-        // TO DO
-        // need to made loading automatic
-        // var new_scene_obj = new GuiNewScene()
 
+        try{
+        ctx1 = Database.loadSchema(conn) // keeps all the key values
         var alert = new GuiAlert()
         (enc, flagV, flag_null, flag_error, input_text) match {
           case ("", _, _, _, _) => alert.showWarning("Please select encoding")
@@ -523,6 +559,14 @@ object GuiNew extends JFXApp {
             }
           }
         }
+      }
+      catch{
+        case Absyn.TypeError(msg) => 
+          val errorAlert = new GuiAlert()
+          errorAlert.showWarning("\nType error: " + msg)
+          println("\nType error: " + msg)
+      }
+        
       }
     }
     /////// TAB 4 ////////
