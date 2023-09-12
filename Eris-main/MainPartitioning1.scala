@@ -1,34 +1,17 @@
-object MainPartitioning {
+
+object MainPartitioning1 {
 
   val p = new RAParser()
 
   def main(args:Array[String]) : Unit = {
-    val connector = Connector(args(0), args(1), args(2), args(3))
-   var input_text = """
-// t1:=(climate_temperature(date = '20200101D'));
-// t2:=(t1[latitude, longitude SUM sea_surface_temperature]);
-// t3:=(copernicus_temperature(date = '20200101'));
-// t4:=(t3[latitude, longitude SUM sea_surface_temperature]);
-// t5:=(t2 DUNION[src] t4)[COAL src]
-
-t1:=(climate_temperature(date = '20200101D'));
-t2:=((t1{counter:=1})[latitude SUM sea_surface_temperature,counter]);
-t3:=(t2{avg_sst:=sea_surface_temperature/counter})[avg_sst];
-t4:=(copernicus_temperature(date = '20200101'));
-t5:=((t4{counter:=1})[latitude SUM sea_surface_temperature,counter]);
-t6:=(t5{avg_sst:=sea_surface_temperature/counter})[avg_sst];
-t7:= (t3 DUNION[src] t6)[COAL src]
-
-
-  // (((((climate_temperature(date = '20200101D')){counter:=1})[latitude SUM sea_surface_temperature,counter]){avg_sst:=sea_surface_temperature/counter})[avg_sst] DUNION[src] ((((copernicus_temperature(date = '20200101')){counter:=1})[latitude SUM sea_surface_temperature,counter]){avg_sst:=sea_surface_temperature/counter})[avg_sst])[COAL src]    
-         """
+    val connector = Connector(args(0),args(1),args(2),args(3))
+//    println(args(3))
     val conn = connector.getConnection()
 
-
     val ctx = Database.loadSchema(conn)
-    var schema1: String = " "
-    var enc=args(4)
-    val encoding = Encoding.encoder_to_use(args.applyOrElse(4, { _: Int => "nf2_sparsev"}))
+    var encoding = Encoding.encoder_to_use(args.applyOrElse(4, { _: Int => "nf2_sparsev"}))
+
+    println(ctx)
 
     // should only be called after queries are typechecked
     def getQuery( q: Absyn.Query): Database.Rel = {
@@ -38,10 +21,11 @@ t7:= (t3 DUNION[src] t6)[COAL src]
       Database.getRelation(stream, q.schema)
     }
 
+    while (true) {
       print("query> ")
-      val str = input_text
+      val str = scala.io.StdIn.readLine()
       try {
-        val q = SolveView.view1(connector, str, encoding, Map())
+        val q = p.parseStr(p.query,str)
         val schema = Absyn.Query.tc(ctx,q)
         println("----->>>>> Result schema")
         println(schema.toString)
@@ -68,9 +52,9 @@ t7:= (t3 DUNION[src] t6)[COAL src]
         val sqlmvc = qmvc.map{case(f,qf) => (f,Absyn.Query.sql(qf))}
 //        val sql0vc = Absyn.Query.sql(q0vc)
         println("----->>>>>>> Query encoding SQL")
-        // println(sql0)
-        // println(sqlm)
-        // println("========")
+        println(sql0)
+        println(sqlm)
+        println("========")
         println("Base result:")
         val result0 = getQuery(q0)
         println(result0)
@@ -86,8 +70,11 @@ t7:= (t3 DUNION[src] t6)[COAL src]
         println("Field results VC:")
         qmvc.map{case(f,qf) => println("-------- "+f);println(getQuery(qf))}
         println("========")
+        val (valuation,objective,eqs,vars,eqCreationTime,solveTime) = VirtualSolver.solve1(connector, q, encoding, false)
+        println(s";$eqs;$vars;"+eqCreationTime+";"+solveTime+";"+objective)
       } catch {
         case Absyn.TypeError(msg) => println("Type error: " + msg)
       }
+    }
   }
 }
