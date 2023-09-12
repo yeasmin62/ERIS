@@ -569,19 +569,6 @@ object GuiNew extends JFXApp {
         
       }
     }
-    /////// TAB 4 ////////
-    val tab4vbox = new VBox(){
-      spacing = 10
-      padding = geometry.Insets(0,0,0,20)
-      // alignment = Center
-    }
-    val tab4lbl = new Label(" Please change the config.txt file according to your database information \n" +
-      "If you are running this for the first time Load the data in Tab 1 before pressing the Run Button \n")
-    val tab4lbl1 = new Label("In your query you can apply this operations: Select (U+03c3), Project (π), ProjectAway (π), Join (⨝), Renaming (U+03C1), Difference ('\'), Aggregation (U+03b3)," +
-"UNION (∪), DUNION  (⊎), Coalescing (к) \n")
-
-    // tab4vbox.children = List(tab4lbl, tab4lbl1)
-
     val rbn6 = new Button("EXIT") {
       layoutX = 260
       layoutY = 490
@@ -649,8 +636,7 @@ object GuiNew extends JFXApp {
       List(new Pane { prefHeight = 10 }, tab3hbox, tab3hbox1, tab3hbox2)
 
     //// Tab 4 /////
-    val tab4scroll = new ScrollPane()
-    tab4scroll.content = tab4vbox
+    val tab4scroll = GuiTabFour.tabfour()
 
 
     ///////// TABPANE/////////

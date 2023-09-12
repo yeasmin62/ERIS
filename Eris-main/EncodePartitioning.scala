@@ -197,18 +197,14 @@ object EncodePartitioning extends Encoding {
           vc)
       // this part is added by me for the operatio of summation of a variable and number
 
-      case Derivation(q,List((f,Plus(Var(a),Num(c))))) =>
-        
-        val (q0,qm,vc) = queryEncoding(q)
-        val q_empty = Emptyset
-        val schema = fieldSchema(q.schema)
-        if(q.schema.varfreeFields.contains(a)){
-          (Derivation(q0,List((f,Plus(Var(a),Num(c))))),qm + {f->Emptyset},vc)
-        }
-        else {
-          (Derivation(q0,List((f,Plus(Var(a),Num(c))))),qm + {f->Emptyset},vc)
+      case Derivation(q,List((b,Plus(Num(c),Var(a))))) =>
+        queryEncoding(Derivation(q,List((b,Plus(Var(a),Num(c))))))
 
-        }
+      case Derivation(q,List((f,Plus(Var(a),Num(c))))) =>
+        val (q0,qm,vc) = queryEncoding(q)
+        (Derivation(q0,List((f,Plus(Var(a),Num(c))))),
+          qm + (f -> qm(a)),
+          vc)
         
 
       case Derivation(q,List((b,Var(a)))) =>
