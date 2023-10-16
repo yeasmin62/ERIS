@@ -11,13 +11,40 @@ object MainPartitioning {
 // t4:=(t3[latitude, longitude SUM sea_surface_temperature]);
 // t5:=(t2 DUNION[src] t4)[COAL src]
 
-t1:=(climate_temperature(date = '20200101D'));
-t2:=((t1{counter:=1})[latitude SUM sea_surface_temperature,counter]);
-t3:=(t2{avg_sst:=sea_surface_temperature/counter})[avg_sst];
-t4:=(copernicus_temperature(date = '20200101'));
-t5:=((t4{counter:=1})[latitude SUM sea_surface_temperature,counter]);
-t6:=(t5{avg_sst:=sea_surface_temperature/counter})[avg_sst];
-t7:= (t3 DUNION[src] t6)[COAL src]
+
+
+
+// t1:=((climate_temperature{latitude->degree005} JOIN resolution005){degree020->latitude});
+// t2:=(t1[latitude SUM sea_surface_temperature]);
+// t4:=(((copernicus_temperature{latitude->degree005}) JOIN resolution005){degree020->latitude});
+// t5:=(t4[latitude SUM sea_surface_temperature]);
+// t6:=(t2 DUNION[src] t5)[COAL src]
+
+
+
+t1:=((climate_temperature{latitude->degree005} JOIN resolution005));
+t2:=(t1[degree020 SUM sea_surface_temperature]);
+t4:=(((copernicus_temperature{latitude->degree005}) JOIN resolution005));
+t5:=(t4[degree020 SUM sea_surface_temperature]);
+t7:=(t2 DUNION[src] t5)[COAL src]
+
+
+
+
+// t4:=(t1{latitude->degree005});
+// t6:=(t4 JOIN resolution005{degree020->la}) JOIN resolution005{degree005->longitude};
+// t8:=((t6{counter:=1})[la, degree020 SUM sea_surface_temperature, counter]);
+// t9:=(t8{avg_sst:= sea_surface_temperature/counter})[avg_sst];
+// t10:=(copernicus_temperature(date = '20200101'));
+// t11:=(t10 JOIN resolution005{degree020->la}) JOIN resolution005{degree005->longitude};
+// t15:=((t11{counter:=1})[la, degree020 SUM sea_surface_temperature, counter]);
+// t16:=(t15{avg_sst:=sea_surface_temperature/counter})[avg_sst];
+// t17:=(t9 DUNION[src] t16)[COAL src]
+
+
+
+
+
 
 
   // (((((climate_temperature(date = '20200101D')){counter:=1})[latitude SUM sea_surface_temperature,counter]){avg_sst:=sea_surface_temperature/counter})[avg_sst] DUNION[src] ((((copernicus_temperature(date = '20200101')){counter:=1})[latitude SUM sea_surface_temperature,counter]){avg_sst:=sea_surface_temperature/counter})[avg_sst])[COAL src]    
@@ -44,7 +71,7 @@ t7:= (t3 DUNION[src] t6)[COAL src]
         val q = SolveView.view1(connector, str, encoding, Map())
         val schema = Absyn.Query.tc(ctx,q)
         println("----->>>>> Result schema")
-        println(schema.toString)
+        // println(schema.toString)
         val (q0,qm,(q0vc,qmvc)) = EncodePartitioning.queryEncoding(q)
         println("----->>>> Query encoding")
         println(q0)
@@ -73,7 +100,7 @@ t7:= (t3 DUNION[src] t6)[COAL src]
         // println("========")
         println("Base result:")
         val result0 = getQuery(q0)
-        println(result0)
+        // println(result0)
         println("========")
         println("Field results:")
         qm.map{case(f,qf) => println("-------- "+f);println(getQuery(qf))}
@@ -86,6 +113,8 @@ t7:= (t3 DUNION[src] t6)[COAL src]
         println("Field results VC:")
         qmvc.map{case(f,qf) => println("-------- "+f);println(getQuery(qf))}
         println("========")
+        val (valuation,objective,eqs,vars,eqCreationTime,solveTime) = VirtualSolver1.solve1(connector, q, encoding, false)
+        println(s";$eqs;$vars;"+eqCreationTime+";"+solveTime+";"+objective)
       } catch {
         case Absyn.TypeError(msg) => println("Type error: " + msg)
       }

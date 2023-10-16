@@ -185,6 +185,26 @@ object GuiNew extends JFXApp {
       children = Seq(loadingLabel, completed)
     }
 
+    val next1 = new Button("Next")
+    {
+      onAction = (e: ActionEvent) => {
+        var alert = new GuiAlert()
+        (enc, flagV, flag_null, flag_error) match {
+          case ("", _, _, _) => alert.showWarning("Please select encoding")
+          case (_, "", _, _) => alert.showWarning("Please select variable")
+          case (_, _, "", _) => alert.showWarning("Please select null option")
+          case (_, _, _, "") => alert.showWarning("Please select cost")
+          case (_, _, _, _) => {
+            tab2.disable = false
+            tabpane.selectionModel().select(tab2)
+
+          }
+          
+        }
+        
+      }
+    }
+
     val loadbtn = new Button("Load") {
       onAction = (e: ActionEvent) => {
         var alert = new GuiAlert()
@@ -195,19 +215,19 @@ object GuiNew extends JFXApp {
             val loadingTask = createLoadingTask()
 
             loadingTask.setOnRunning { _ =>
-              progressBar.progress = -1 // Indeterminate progress
+              progressBar2.progress = -1 // Indeterminate progress
               completed.visible = false
               loadingLabel.visible = true
 
             }
 
             loadingTask.setOnSucceeded { _ =>
-              progressBar.progress = 1 // Completed progress
+              progressBar2.progress = 1 // Completed progress
               // loadingLabel.text = "Completed!!"
               loadingLabel.visible = false
               completed.visible = true
-              tab2.disable = false
-              tabpane.selectionModel().select(tab2)
+              tab3.disable = false
+              tabpane.selectionModel().select(tab3)
             }
 
             new Thread(loadingTask).start()
@@ -439,7 +459,7 @@ object GuiNew extends JFXApp {
     Tooltip.install(up_schema, new Tooltip("First Update schema, then Refresh Loading"))
     var (loadingLabel3, completed3) = new EquationConversion().LabelCompleted()
 
-    val refreshbutton = new Button("Refresh Loading")
+    val refreshbutton = new Button("Load")
     {
       onAction = (e: ActionEvent) => {
       ctx1 = Database.loadSchema(conn)
@@ -602,9 +622,8 @@ object GuiNew extends JFXApp {
       rbn_a_error,
       rbn_value_interval,
       new Pane { prefHeight = 10 },
-      progressBar,
       tab1hbox,
-      loadbtn
+      next1
     )
 
     ////////// Tab 2 /////////////
