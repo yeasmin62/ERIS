@@ -152,7 +152,8 @@ object EncodePartitioning extends Encoding {
           }
         }
         (Rename(q0,renaming),
-          qm.map{case (f,qf) => (find(f),qf)},
+          // qm.map{case (f,qf) => (find(f),qf)},
+          qm.map{case (f,qf) => (find(f),Rename(qf,renaming))},
           vc)
 
         //TODO: Do not handle this case

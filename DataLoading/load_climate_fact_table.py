@@ -85,8 +85,8 @@ def load_climate(connection_info):
 
     point_lat = pd.read_csv(r'Dimensioncsv/medi_lat.csv')
     point_lon = pd.read_csv(r'Dimensioncsv/medi_lon.csv')
-    points_lat = point_lat['lat'][:20].to_numpy()
-    points_lon = point_lon['lon'][:20].to_numpy()
+    points_lat = point_lat['lat'][:5].to_numpy()
+    points_lon = point_lon['lon'][:5].to_numpy()
 
     strpro = stringClass()
 

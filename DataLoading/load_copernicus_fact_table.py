@@ -32,8 +32,8 @@ def process_file(args):
 
     filename, dict, connection_string, time_chunk = args
     nc = nc4.Dataset(filename, 'r', Format='NETCDF4')  # Open the dataset in the process
-    lats = nc.variables['lat'][:20]
-    lons = nc.variables['lon'][:20]
+    lats = nc.variables['lat'][:5]
+    lons = nc.variables['lon'][:5]
     times = nc.variables['time'][time_chunk]
     units = nc.variables['time'].units
     
