@@ -80,8 +80,8 @@ def load_pathfinder(connection_info):
 
     point_lat = pd.read_csv(r'Dimensioncsv/medi_lat.csv')
     point_lon = pd.read_csv(r'Dimensioncsv/medi_lon.csv')
-    points_lat = point_lat['lat'][:3].to_numpy()
-    points_lon = point_lon['lon'][:3].to_numpy()
+    points_lat = point_lat['lat'][:1].to_numpy()
+    points_lon = point_lon['lon'][:1].to_numpy()
 
     strpro = stringClass()
 

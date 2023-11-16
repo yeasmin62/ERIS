@@ -585,6 +585,9 @@ object GuiNew extends JFXApp {
           val errorAlert = new GuiAlert()
           errorAlert.showWarning("\nType error: " + msg)
           println("\nType error: " + msg)
+        case VirtualSolver.DataProcessingException(msg) =>
+          val errorAlert = new GuiAlert()
+          errorAlert.showWarning(msg)
       }
         
       }

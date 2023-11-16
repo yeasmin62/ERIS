@@ -6,14 +6,21 @@ object Main {
   def main(args:Array[String]) : Unit = {
     val connector = Connector(args(0), args(1), args(2), args(3))
    var input_text = """
-t1:=(climate_temperature(date = '20200101D'));
-t2:=(t1[date, latitude,longitude SUM sea_surface_temperature]);
-t3:=(copernicus_temperature(date = '20200101'));
-t4:=(t3[date,latitude,longitude SUM sea_surface_temperature]);
-t5:=(t2 DUNION[src] t4)[COAL src]
+// t1:=(climate_temperature(date = '20200101D'));
+// t2:=(t1[date, latitude,longitude SUM sea_surface_temperature]);
+// t3:=(copernicus_temperature(date = '20200101'));
+// t4:=(t3[date,latitude,longitude SUM sea_surface_temperature]);
+// t5:=(t2 DUNION[src] t4)[COAL src]
 
 // t1:=(climate_temperature(date = '20200101D'));
 // t2:=([latitude,longitude SUM sea_surface_temperature,counter])
+
+t1:=(climate_temperature[latitude SUM sea_surface_temperature]);
+t2:= (copernicus_temperature[latitude SUM sea_surface_temperature]);
+t3:=(t1 DUNION[discr] t2)[COAL discr]
+
+
+
 
       
          """
@@ -93,7 +100,7 @@ t5:=(t2 DUNION[src] t4)[COAL src]
         val result0vc = getQuery(q0vc)
         // println(result0vc)
         println("========")
-        val (valuation,objective,eqs,vars,eqCreationTime,solveTime) = VirtualSolver1.solve1(connector, q, encoding, false)
+        val (valuation,objective,eqs,vars,eqCreationTime,solveTime) = VirtualSolver.solve1(connector, q, encoding, false)
         println(s";$eqs;$vars;"+eqCreationTime+";"+solveTime+";"+objective)
       } catch {
         case Absyn.TypeError(msg) => println("Type error: " + msg)

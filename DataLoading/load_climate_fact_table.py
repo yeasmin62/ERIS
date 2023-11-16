@@ -53,6 +53,10 @@ def process_file(args):
             data = cd_actual[0][pos[0], pos[1]].astype(float)
             data_list.append({'date': d, 'latitude': dict_lat_lon[k1], 'longitude': dict_lat_lon[k2],
                               'sea_surface_temperature': data})
+        # else: 
+        #     data = None
+        #     data_list.append({'date': d, 'latitude': dict_lat_lon[k1], 'longitude': dict_lat_lon[k2],
+        #                       'sea_surface_temperature': data})
 
     data_df = pd.DataFrame(data_list)
     engine = create_engine(connection_string)

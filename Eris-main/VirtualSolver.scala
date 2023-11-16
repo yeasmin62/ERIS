@@ -13,6 +13,8 @@ import scala.annotation.tailrec
 import play.api.libs.json.Json
 import play.api.libs.json.{JsValue, Reads}
 import com.fasterxml.jackson.core.JsonParser
+import play.api.libs.json._
+import scala.io.Source
 
 object VirtualSolver {
   val p = new RAParser()
@@ -316,12 +318,14 @@ def get(x, i):
     //println("VirtualSolver emitQPSParseIter emitWeights(n,fvsmap)" + emitWeights(n,fvsmap))
     wr.write(")\n")
     wr.write(s"q = np.array(np.zeros($n))\n")
-    wr.write(s"A = sparse.csc_matrix(sparse.coo_matrix((get(data,0),(get(data,1),get(data,2))),shape=($m,$n)))\n")
-    wr.write(s"c = np.hstack([np.ones(1),np.zeros($m-1)])\n")
+    wr.write(s"Ad = sparse.csc_matrix(sparse.coo_matrix((get(data,0),(get(data,1),get(data,2))),shape=($m,$n)))\n")
+    wr.write(s"A = sparse.bmat([[Ad,            -sparse.eye($m)],[sparse.eye($n),  None]], format='csc')\n")
+    wr.write(s"l = np.hstack([np.ones(1),np.zeros($m-1), np.ones($n)])\n")
+    wr.write(s"u = np.hstack([np.ones(1),np.zeros($m-1), np.inf*np.ones($n)])\n")
     wr.write(
       raw"""
 prob = osqp.OSQP()
-prob.setup(P, q, A, c, c,  verbose=False)
+prob.setup(P, q, A, l, u,  verbose=False)
 res = prob.solve()
 print(json.dumps({"solution": res.x.tolist(), "objective": res.info.obj_val}))
 """)
@@ -446,42 +450,60 @@ print(json.dumps({"solution": res.x.tolist(), "objective": res.info.obj_val}))
 
   }
 
-  def parseJsonResult(json: play.api.libs.json.JsValue): (List[Double], Double) = {
-    val solution = (json \ "solution").get.validate[List[Double]].getOrElse(List.empty[Double])
-  val objective = (json \ "objective").get.validate[Double].getOrElse(Double.NaN)
+  // def parseJsonResult(json: play.api.libs.json.JsValue): (List[Double], Double) = {
+  //   val solution = (json \ "solution").get.validate[List[Double]].getOrElse(List.empty[Double])
+  // val objective = (json \ "objective").get.validate[Double].getOrElse(Double.NaN)
 
-  (solution, objective)
+  // (solution, objective)
+  // }
+  case class DataProcessingException(message: String) extends Exception(message)
+
+  def parseJsonResult(json: JsValue): (List[Double], Double) = {
+  try {
+    val solution = (json \ "solution").validate[List[Double]] match {
+      case JsSuccess(value, _) => value
+      case JsError(_) =>
+        throw new DataProcessingException("No Solution for this data")
+    }
+
+    val objective = (json \ "objective").validate[Double] match {
+      case JsSuccess(value, _) => value
+      case JsError(_) =>
+        throw new DataProcessingException("No Solution for this data")
+    }
+
+    (solution, objective)
+  } catch {
+    case e: Exception =>
+      throw new DataProcessingException(e.getMessage)
   }
+}
   
 
   def runOSQPStreaming[A](script: Emitter[A]): (A, (List[Double], Double), Double, Double) = {
+  val filename = "foo.py"
+  val pythonname = if (new File("python.bat").exists) "python.bat" else "python3"
+  val file = new File(filename)
+  val writer = new PrintWriter(new BufferedWriter(new FileWriter(filename)))
+  val (a, scriptTime) = Timer.timeIt(script(writer))
+  writer.close()
 
-
-    val filename = "foo.py"
-    val pythonname = if (new File("python.bat").exists) {
-      "python.bat"
-    } else {
-      "python3"
-    }
-    val file = new File(filename)
-    val writer = new PrintWriter(new BufferedWriter(new FileWriter(filename)))
-    val (a, scriptTime) = Timer.timeIt(script(writer))
-    //println("run OSQP Streamin a = " + a)
-    writer.close()
-
-    def run() = {
-      val processBuilder = new ProcessBuilder(pythonname, file.getAbsolutePath())
-      val process = processBuilder.start()
-      Json.parse(process.getInputStream())
-    }
-
-    val (results, runTime) = Timer.timeIt(run())
-    //println("Virtual Solver runOSQPStreaming results" + results)
-    (a, parseJsonResult(results), scriptTime, runTime)
-    //println("Virtual Solver runOSQPStreaming parseJsonResult(results)" + parseJsonResult(results))
-    (a, parseJsonResult(results), scriptTime, runTime)
-
+  def run() = {
+    val processBuilder = new ProcessBuilder(pythonname, file.getAbsolutePath())
+    val process = processBuilder.start()
+    val output = Source.fromInputStream(process.getInputStream()).mkString
+    val sanitizedOutput = output.replace("Infinity", "\"Infinity\"")
+    Json.parse(sanitizedOutput)
   }
+
+  val (results, runTime) = Timer.timeIt(run())
+  try {
+    (a, parseJsonResult(results), scriptTime, runTime)
+  } catch {
+    case e: DataProcessingException =>
+      throw new DataProcessingException("SolveError:"+ e.getMessage)
+  }
+}
 
   // TODO: Split this into a function that extends a LP/QP problem with the constraints
   // entailed by coalescing a raw table and symbolic table, and another function that finalizes the

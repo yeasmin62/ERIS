@@ -32,8 +32,8 @@ def process_file(args):
 
     filename, dict, connection_string, time_chunk = args
     nc = nc4.Dataset(filename, 'r', Format='NETCDF4')  # Open the dataset in the process
-    lats = nc.variables['lat'][:5]
-    lons = nc.variables['lon'][:5]
+    lats = nc.variables['lat'][0:5]
+    lons = nc.variables['lon'][0:5]
     times = nc.variables['time'][time_chunk]
     units = nc.variables['time'].units
     
@@ -49,11 +49,16 @@ def process_file(args):
             k1 = generate_key_lat(lat)
             for lon_index, lon in enumerate(lons):
                 k2 = generate_key_lon(lon)
-                data = sfc[lat_index, lon_index].astype(float)
+                
 
                 if sfc.mask[lat_index, lon_index] == False:
+                    data = sfc[lat_index, lon_index].astype(float)
                     data_list.append({'date': c, 'latitude': dict[k1], 'longitude': dict[k2],
                               'sea_surface_temperature': data})
+                # else:
+                #     data = None
+                #     data_list.append({'date': c, 'latitude': dict[k1], 'longitude': dict[k2],
+                #               'sea_surface_temperature': data})
 
         data_df = pd.DataFrame(data_list)
         engine = create_engine(connection_string)
