@@ -4,6 +4,7 @@ import scalafx.application.JFXApp.PrimaryStage
 import scalafx.geometry.Insets
 import scalafx.scene.Scene
 import scalafx.scene.control.Label
+import scala.collection.mutable.ListBuffer
 import scalafx.scene.layout.BorderPane
 import scala.io.Source
 import javafx.scene.control.ScrollPane
@@ -18,6 +19,7 @@ object GuiScene1 extends JFXApp {
   def printmsg(
       connector: Connector,
       input_text: String,
+      boundlist: ListBuffer[Double],
       ctx1: Database.InstanceSchema,
       enc:String,
       encoding: Encoding,
@@ -33,7 +35,7 @@ object GuiScene1 extends JFXApp {
 
       val test = GuiMain
       var (schema, q0, q0vc,schema0, schema0vc, sql0, sql0vc, result0, result0vc, eq) =
-        test.queryprint(connector, input_text, ctx1,enc, encoding)
+        test.queryprint(connector, input_text,boundlist, ctx1,enc, encoding)
       // var (valuation, objective, eqs, vars, eqCreationTime, solveTime) =
       //   test.costprint(connector, input_text, ctx, encoding)
       // print(result0)

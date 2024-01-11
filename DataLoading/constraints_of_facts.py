@@ -24,13 +24,13 @@ def fact_constraints(cursor):
     '''ALTER TABLE climate_temperature ADD CONSTRAINT climate_temperature_fk3 FOREIGN KEY (longitude) 
     REFERENCES Resolution005(degree005) ON DELETE CASCADE ON UPDATE CASCADE DEFERRABLE;''',
     '''ALTER TABLE modisaqua_temperature ADD CONSTRAINT modisaqua_temperature_fk FOREIGN KEY ("date") 
-    REFERENCES dates(id) ON DELETE CASCADE ON UPDATE CASCADE DEFERRABLE;''',
+    REFERENCES Semiday(id) ON DELETE CASCADE ON UPDATE CASCADE DEFERRABLE;''',
     '''ALTER TABLE modisaqua_temperature ADD CONSTRAINT modisaqua_temperature_fk2 FOREIGN KEY (latitude) 
     REFERENCES Resolution004(degree004) ON DELETE CASCADE ON UPDATE CASCADE DEFERRABLE;''',
     '''ALTER TABLE modisaqua_temperature ADD CONSTRAINT modisaqua_temperature_fk3 FOREIGN KEY (longitude) 
     REFERENCES Resolution004(degree004) ON DELETE CASCADE ON UPDATE CASCADE DEFERRABLE;''',
     '''ALTER TABLE pathfinder_temperature ADD CONSTRAINT pathfinder_temperature_fk FOREIGN KEY ("date") 
-    REFERENCES SEMIDAY(id) ON DELETE CASCADE ON UPDATE CASCADE DEFERRABLE;''',
+    REFERENCES Semiday(id) ON DELETE CASCADE ON UPDATE CASCADE DEFERRABLE;''',
     '''ALTER TABLE pathfinder_temperature ADD CONSTRAINT pathfinder_temperature_fk2 FOREIGN KEY (latitude) 
     REFERENCES Resolution004(degree004) ON DELETE CASCADE ON UPDATE CASCADE DEFERRABLE;''',
     '''ALTER TABLE pathfinder_temperature ADD CONSTRAINT pathfinder_temperature_fk3 FOREIGN KEY (longitude) 

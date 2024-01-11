@@ -1,3 +1,4 @@
+import scala.collection.mutable.ListBuffer
 object COVIDDeaths1 {
 
   def main(args:Array[String]) : Unit = {
@@ -12,6 +13,7 @@ object COVIDDeaths1 {
     val flagV = args(6).toBoolean
     val flag_null = args(7).toBoolean
     val flag_error = args(8)
+    var boundlist: ListBuffer[Double] = ListBuffer()
 
     val connector = Connector(hostname, dbname, username, password)
     //var newfile = newview(specfile)
@@ -69,12 +71,12 @@ object COVIDDeaths1 {
         if (shift==1) {
           // Coalescing all data from both EUROStats and JHU as in the paper diagram
 
-          val (_,objective,eqs,vars,eqCreationTime,solveTime) = SolveView.view(connector, specfile, encoding, vlist, flag_error, flag_null)
+          val (_,objective,eqs,vars,eqCreationTime,solveTime) = SolveView.view(connector, specfile,boundlist, encoding, vlist, flag_error, flag_null)
           // println(s"WithoutJHURegions;-;$co;$wid;$eqs;$vars;"+eqCreationTime+";"+solveTime+";"+objective)
           }
         else {
           // Coalescing all data from both EUROStats and JHU as in the paper diagram
-          val (_, objective, eqs, vars, eqCreationTime, solveTime) = SolveView.view(connector, specfile, encoding, vlist,flag_error,flag_null)
+          val (_, objective, eqs, vars, eqCreationTime, solveTime) = SolveView.view(connector, specfile,boundlist, encoding, vlist,flag_error,flag_null)
           // println(s"WithJHURegions;$shift;$co;$wid;$eqs;$vars;" + eqCreationTime + ";" + solveTime + ";" + objective)
         }
         }

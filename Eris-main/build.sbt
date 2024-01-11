@@ -5,7 +5,8 @@ scalaVersion := "2.13.10"
 
 libraryDependencies ++= Seq(
     "com.typesafe.play" %% "play-json" % "2.9.4",
-    "org.scalafx" %% "scalafx" % "19.0.0-R30"
+    "org.scalafx" %% "scalafx" % "19.0.0-R30",
+    "org.scalafx" %% "scalafx" % "16.0.0-R24"
 )
 
 libraryDependencies ++= {

@@ -1,4 +1,4 @@
-
+import scala.collection.mutable.ListBuffer
 object MainPartitioning1 {
 
   val p = new RAParser()
@@ -70,7 +70,8 @@ object MainPartitioning1 {
         println("Field results VC:")
         qmvc.map{case(f,qf) => println("-------- "+f);println(getQuery(qf))}
         println("========")
-        val (valuation,objective,eqs,vars,eqCreationTime,solveTime) = VirtualSolver.solve1(connector, q, encoding, false)
+        var boundlist: ListBuffer[Double] = ListBuffer()
+        val (valuation,objective,eqs,vars,eqCreationTime,solveTime) = VirtualSolver.solve1(connector, q,boundlist, encoding, false)
         println(s";$eqs;$vars;"+eqCreationTime+";"+solveTime+";"+objective)
       } catch {
         case Absyn.TypeError(msg) => println("Type error: " + msg)

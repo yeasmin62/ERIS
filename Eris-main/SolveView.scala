@@ -2,6 +2,7 @@
 
 
 import scala.collection.immutable.List
+import scala.collection.mutable.ListBuffer
 import scala.io.Source
 
 // Evaluates multiple  query and combines it in single query.
@@ -28,7 +29,7 @@ object  SolveView {
   }
 
 //take inputs from specfile, parse the file into query, combines all the query into single one, sends that to VirtualSolver to solve the equations
-  def view(connector: Connector, specfile: String, encoding: Encoding, vlist:Map[String,String], flag_error:String, flag_null:Boolean):(List[(String,Double)],Double,Int,Int,Double,Double) = {
+  def view(connector: Connector, specfile: String, boundlist:ListBuffer[Double], encoding: Encoding, vlist:Map[String,String], flag_error:String, flag_null:Boolean):(List[(String,Double)],Double,Int,Int,Double,Double) = {
     //println("\n specfile \n")
 
     val p = new RAParser() //creates an object of RAParser
@@ -65,7 +66,7 @@ object  SolveView {
     //println("After combonation Spec " + cstring)
 
     result = flag_error match {
-      case "ASE" => {VirtualSolver.solve1(connector, cstring, encoding, flag_null)}
+      case "ASE" => {VirtualSolver.solve1(connector, cstring,boundlist, encoding, flag_null)}
       case "AAE" => {VirtualSolverAAE.solve1(connector, cstring, encoding, flag_null)}
       case "Value_Interval" => {VirtualSolver1.solve1(connector, cstring, encoding, flag_null)}
 
@@ -82,6 +83,7 @@ object  SolveView {
 
     val (valuation,objective,eqs,vars,eqCreationTime,solveTime) = result
     println(s";$eqs;$vars;"+eqCreationTime+";"+solveTime+";"+objective)
+    // print(valuation)
     (valuation,objective,eqs,vars,eqCreationTime,solveTime)
   }
 
@@ -196,22 +198,44 @@ object  SolveView {
       }
     } else { // Read from spec file
       var vlist:Map[String, String] = Map()
+      var boundlist: ListBuffer[Double] = ListBuffer()
       // val flag_error = false
       // val flag_null = false
-      var date = List("20200101","20200102","20200103","20200104","20200105","20200106","20200107","20200108","20200109","20200110","20200111","20200112","20200113","20200114","20200115","20200116","20200117","20200118","20200119", "20200120", "20200121","20200122","20200123","20200124","20200125","20200126","20200127","20200128","20200129","20200130","20200131")
-    //  var date = List("20200101", "20200102","20200103")
-      for(d<-date)
+      // var date = List("20200101","20200102","20200103","20200104","20200105","20200106","20200107","20200108","20200109","20200110","20200111","20200112","20200113","20200114","20200115","20200116","20200117","20200118","20200119", "20200120", "20200121","20200122","20200123","20200124","20200125","20200126","20200127","20200128","20200129","20200130","20200131")
+    var date = List("20200101", "20200102","20200103")
+    for(d<-date)
       {
         // print(d)
 //        print("\n")
-        val c = d.substring(0, d.length()-1)
+        // val c = d.substring(0, d.length()-1)
         print(d)
         vlist = Map("#" + 1-> d, "#" + 2-> d)
 //        vlist = Map("#" + 1-> d)
-        view(connector, args(4), encoding, vlist, flag_error, flag_null.toBoolean)
+        view(connector, args(4), boundlist, encoding, vlist, flag_error, flag_null.toBoolean)
         
       }
-
+//       var lat = List("+030.10 ~ +030.15", "+030.20 ~ +030.25", "+030.25 ~ +030.30", "+030.30 ~ +030.35", "+030.35 ~ +030.40")
+//       for(l<-lat)
+//       {
+//         // print(d)
+// //        print("\n")
+//         print(l)
+//         vlist = Map("#" + 1-> l, "#" + 2-> l)
+// //        vlist = Map("#" + 1-> d)
+//         view(connector, args(4), encoding, vlist, flag_error, flag_null.toBoolean)
+        
+//       }
+//       var lon = List("-017.40 ~ -017.35", "-017.45 ~ -017.40", "-017.50 ~ -017.45", "-017.55 ~ -017.50", "-017.60 ~ -017.55")
+//       for(l<-lon)
+//       {
+//         // print(d)
+// //        print("\n")
+//         print(l)
+//         vlist = Map("#" + 1-> l, "#" + 2-> l)
+// //        vlist = Map("#" + 1-> d)
+//         view(connector, args(4), boundlist, encoding, vlist, flag_error, flag_null.toBoolean)
+        
+//       }
 //      view(connector, args(4), encoding, vlist, flag_error, flag_null)
 
     }

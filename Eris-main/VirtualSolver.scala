@@ -1,4 +1,5 @@
 import scala.collection.immutable._
+import scala.collection.mutable.ListBuffer
 import java.lang.ProcessBuilder
 import java.io.File
 import java.io.BufferedReader
@@ -296,8 +297,45 @@ object VirtualSolver {
   }
 
 
-  // iteratively build OSQP input from stream of equations
-  def emitQPSparseIter(r: Iterator[Database.Equation], flag_null: Boolean): Emitter[(BiMap[String, Int], Int, Int)] = { wr =>
+  //iteratively build OSQP input from stream of equations
+//   def emitQPSparseIter(r: Iterator[Database.Equation], flag_null: Boolean): Emitter[(BiMap[String, Int], Int, Int)] = { wr =>
+//     wr.write(
+//       raw"""
+// import osqp
+// import numpy as np
+// from scipy import sparse
+// import math
+// import json
+
+// def get(x, i): 
+//     return np.array([r[i] for r in x])
+
+// """)
+//     wr.write("data = ")
+//     val (fvsmap, m, n) = emitData(r)(wr)
+//     wr.write("\n")
+//     wr.write("P = sparse.block_diag([sparse.csc_matrix(")
+//     emitWeights(n, fvsmap, flag_null)(wr)
+//     //println("VirtualSolver emitQPSParseIter emitWeights(n,fvsmap)" + emitWeights(n,fvsmap))
+//     wr.write(s"), sparse.eye($m)], format='csc')\n")
+//     wr.write(s"q = np.array(np.zeros($n + $m))\n")
+//     wr.write(s"Ad = sparse.csc_matrix(sparse.coo_matrix((get(data,0),(get(data,1),get(data,2))),shape=($m,$n)))\n")
+//     wr.write(s"A = sparse.bmat([[Ad,            -sparse.eye($m)],[sparse.eye($n),  None]], format='csc')\n")
+//     wr.write(s"l = np.hstack([np.ones(1),np.zeros($m-1), -np.inf*np.ones($n)])\n")
+//     wr.write(s"u = np.hstack([np.ones(1),np.zeros($m-1), np.inf*np.ones($n)])\n")
+//     wr.write(
+//       raw"""
+// prob = osqp.OSQP()
+// prob.setup(P, q, A, l, u,  verbose=False)
+// res = prob.solve()
+// print(json.dumps({"solution": res.x.tolist(), "objective": res.info.obj_val}))
+// """)
+//     (fvsmap, m, n)
+//   }
+
+def emitQPSparseIter(r: Iterator[Database.Equation],boundlist:ListBuffer[Double], flag_null: Boolean): Emitter[(BiMap[String, Int], Int, Int)] = { wr =>
+     var lb = boundlist(0)
+     var ub = boundlist(1) 
     wr.write(
       raw"""
 import osqp
@@ -305,23 +343,30 @@ import numpy as np
 from scipy import sparse
 import math
 import json
-
 def get(x, i): 
     return np.array([r[i] for r in x])
-
 """)
     wr.write("data = ")
     val (fvsmap, m, n) = emitData(r)(wr)
     wr.write("\n")
-    wr.write("P = sparse.csc_matrix(")
-    emitWeights(n, fvsmap, flag_null)(wr)
+    wr.write(s"P = sparse.block_diag([sparse.csc_matrix(($n, $n)), sparse.eye($m)], format='csc')\n")
+    // emitWeights(n, fvsmap, flag_null)(wr)
     //println("VirtualSolver emitQPSParseIter emitWeights(n,fvsmap)" + emitWeights(n,fvsmap))
-    wr.write(")\n")
-    wr.write(s"q = np.array(np.zeros($n))\n")
+    // wr.write(")\n")
+    wr.write(s"q = np.array(np.zeros($n + $m))\n")
     wr.write(s"Ad = sparse.csc_matrix(sparse.coo_matrix((get(data,0),(get(data,1),get(data,2))),shape=($m,$n)))\n")
     wr.write(s"A = sparse.bmat([[Ad,            -sparse.eye($m)],[sparse.eye($n),  None]], format='csc')\n")
-    wr.write(s"l = np.hstack([np.ones(1),np.zeros($m-1), np.ones($n)])\n")
-    wr.write(s"u = np.hstack([np.ones(1),np.zeros($m-1), np.inf*np.ones($n)])\n")
+    if (lb == Double.NegativeInfinity){
+      wr.write(s"l = np.hstack([np.ones(1),np.zeros($m-1), -np.inf*np.ones($n)])\n")
+    } 
+    else {
+      wr.write(s"l = np.hstack([np.ones(1),np.zeros($m-1), $lb*np.ones($n)])\n")
+    }
+    if (ub == Double.PositiveInfinity){
+      wr.write(s"u = np.hstack([np.ones(1),np.zeros($m-1), np.inf*np.ones($n)])\n")}
+    else{
+      wr.write(s"u = np.hstack([np.ones(1),np.zeros($m-1), $ub*np.ones($n)])\n")
+    }
     wr.write(
       raw"""
 prob = osqp.OSQP()
@@ -331,7 +376,6 @@ print(json.dumps({"solution": res.x.tolist(), "objective": res.info.obj_val}))
 """)
     (fvsmap, m, n)
   }
-
 
   def toOSQP(p: String, q: String, l: String, a: String, u: String): String = {
     raw"""
@@ -535,12 +579,12 @@ print(json.dumps({"solution": res.x.tolist(), "objective": res.info.obj_val}))
     (valuation, objective)
   }
 
-  def solveIter(r: Iterator[Database.Equation], flag_null: Boolean): (List[(String, Double)], Double, Int, Int, Double, Double) = {
+  def solveIter(r: Iterator[Database.Equation],boundlist:ListBuffer[Double], flag_null: Boolean): (List[(String, Double)], Double, Int, Int, Double, Double) = {
     if (r.isEmpty) {
       (List(), 0, 0, 0, 0, 0)
     } else {
       //println("EmitQPSparse Iter" +emitQPSparseIter(r))
-      val (osqp, emitTime) = timeIt(emitQPSparseIter(r, flag_null))
+      val (osqp, emitTime) = timeIt(emitQPSparseIter(r,boundlist, flag_null))
       //println("osqp " + osqp)
       val ((fvsmap, m, n), (xs, x), scriptTime, solveTime) = runOSQPStreaming(osqp)
 
@@ -549,25 +593,27 @@ print(json.dumps({"solution": res.x.tolist(), "objective": res.info.obj_val}))
       def getValuation(vs: List[Double], i: Int, acc: List[(String, Double)]): List[(String, Double)] = vs match {
         case Nil => acc
         case v :: vs =>
+          // print(vs.length)
+          // print("\n")
           getValuation(vs, i + 1, (fvsmap._2(i), v) :: acc)
       }
 
-      val (valuation, valuationTime) = timeIt(getValuation(xs, 0, List()))
+      val (valuation, valuationTime) = timeIt(getValuation(xs.take(n), 0, List()))
       //println("Valuation " + valuation)
       val (relvars, relvarTime) = timeIt(valuation.filterNot { case (v, _) => v.startsWith("_") }.length)
       (valuation, x / relvars, m, relvars, emitTime + scriptTime, solveTime)
     }
   }
 
-  def processIter(conn: java.sql.Connection, encoder: Encoding, ctx: Database.InstanceSchema, es: Database.InstanceSchema, str: String, flag_null: Boolean): (List[(String, Double)], Double, Int, Int, Double, Double) = {
-    val q = p.parseStr(p.query, str)
-    //println(q)
-    val schema = Absyn.Query.tc(ctx, q)
-    val eq = encoder.queryEncoding(q)
-    val (enc_iter_constraints, eqCreationTime) = timeIt(encoder.iterateEncodedConstraints(conn, eq, es))
-    val (valuation, objective, eqs, vars, emitTime, solveTime) = solveIter(enc_iter_constraints, flag_null)
-    (valuation, objective, eqs, vars, emitTime + eqCreationTime, solveTime)
-  }
+  // def processIter(conn: java.sql.Connection, encoder: Encoding, ctx: Database.InstanceSchema, es: Database.InstanceSchema, str: String, flag_null: Boolean): (List[(String, Double)], Double, Int, Int, Double, Double) = {
+  //   val q = p.parseStr(p.query, str)
+  //   //println(q)
+  //   val schema = Absyn.Query.tc(ctx, q)
+  //   val eq = encoder.queryEncoding(q)
+  //   val (enc_iter_constraints, eqCreationTime) = timeIt(encoder.iterateEncodedConstraints(conn, eq, es))
+  //   val (valuation, objective, eqs, vars, emitTime, solveTime) = solveIter(enc_iter_constraints, flag_null)
+  //   (valuation, objective, eqs, vars, emitTime + eqCreationTime, solveTime)
+  // }
 
   def equations(r: Iterator[Database.Equation]): Any = {
     if (r.isEmpty) {
@@ -582,7 +628,7 @@ print(json.dumps({"solution": res.x.tolist(), "objective": res.info.obj_val}))
   }
 
 
-  def processIter1(conn: java.sql.Connection, encoder: Encoding, ctx: Database.InstanceSchema, es: Database.InstanceSchema, str: Absyn.Query,flag_null:Boolean): (List[(String,Double)],Double,Int,Int,Double,Double) = {
+  def processIter1(conn: java.sql.Connection,boundlist:ListBuffer[Double], encoder: Encoding, ctx: Database.InstanceSchema, es: Database.InstanceSchema, str: Absyn.Query,flag_null:Boolean): (List[(String,Double)],Double,Int,Int,Double,Double) = {
     //val q = p.parseStr(p.query,str)
     val schema = Absyn.Query.tc(ctx,str)
     //println("schema" + schema)
@@ -590,30 +636,30 @@ print(json.dumps({"solution": res.x.tolist(), "objective": res.info.obj_val}))
     //println(eq)
     val (enc_iter_constraints,eqCreationTime) = timeIt(encoder.iterateEncodedConstraints(conn,eq,es))
     //println("Process Iter 1 " + enc_iter_constraints)
-    val (valuation,objective,eqs,vars,emitTime,solveTime) = solveIter(enc_iter_constraints,flag_null)
+    val (valuation,objective,eqs,vars,emitTime,solveTime) = solveIter(enc_iter_constraints,boundlist,flag_null)
     //println("valuation " + valuation + "objective "  + objective)
     (valuation, objective, eqs, vars, emitTime+eqCreationTime, solveTime)
   }
 
-  def solve(connector: Connector, tbl: String, encoding: Encoding,flag_null:Boolean): (List[(String,Double)],Double,Int,Int,Double,Double) = {
+  // def solve(connector: Connector, tbl: String, encoding: Encoding,flag_null:Boolean): (List[(String,Double)],Double,Int,Int,Double,Double) = {
+  //   val conn = connector.getConnection()
+  //   //println("CONN" + conn)
+  //   conn.setAutoCommit(false)
+  //   val ctx = Database.loadSchema(conn)
+  //   //println("CTX" + ctx)
+  //   val es = encoding.instanceSchemaEncoding(ctx)
+  //   //println("ES" + es)
+  //   val result = processIter(conn, encoding, ctx, es, tbl,flag_null)
+  //   //println("RESULT" + result)
+  //   conn.close()
+  //   result
+  // }
+  def solve1(connector: Connector, tbl: Absyn.Query,boundlist:ListBuffer[Double], encoding: Encoding, flag_null:Boolean): (List[(String,Double)],Double,Int,Int,Double,Double) = {
     val conn = connector.getConnection()
-    //println("CONN" + conn)
     conn.setAutoCommit(false)
     val ctx = Database.loadSchema(conn)
-    //println("CTX" + ctx)
     val es = encoding.instanceSchemaEncoding(ctx)
-    //println("ES" + es)
-    val result = processIter(conn, encoding, ctx, es, tbl,flag_null)
-    //println("RESULT" + result)
-    conn.close()
-    result
-  }
-  def solve1(connector: Connector, tbl: Absyn.Query, encoding: Encoding, flag_null:Boolean): (List[(String,Double)],Double,Int,Int,Double,Double) = {
-    val conn = connector.getConnection()
-    conn.setAutoCommit(false)
-    val ctx = Database.loadSchema(conn)
-    val es = encoding.instanceSchemaEncoding(ctx)
-    val result = processIter1(conn, encoding, ctx, es, tbl, flag_null)
+    val result = processIter1(conn,boundlist, encoding, ctx, es, tbl, flag_null)
     conn.close()
     result
   }
@@ -656,7 +702,10 @@ print(json.dumps({"solution": res.x.tolist(), "objective": res.info.obj_val}))
     } else {
       val flag_error = true
       val flag_null = true
-      solve(connector, args(5), encoder_to_use,flag_null)
+      val boundlist: ListBuffer[Double] = ListBuffer()
+      var vlist:Map[String, String] = Map()
+      val q = SolveView.view1(connector, args(5),encoder_to_use, vlist)
+      solve1(connector, q ,boundlist, encoder_to_use,flag_null)
     }
   }
 }

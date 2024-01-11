@@ -1,38 +1,33 @@
-
+import scala.collection.mutable.ListBuffer
 object Main {
+  
 
   val p = new RAParser()
-
   def main(args:Array[String]) : Unit = {
     val connector = Connector(args(0), args(1), args(2), args(3))
    var input_text = """
 // t1:=(climate_temperature(date = '20200101D'));
-// t2:=(t1[date, latitude,longitude SUM sea_surface_temperature]);
+// t2:=(t1[date SUM sea_surface_temperature]);
 // t3:=(copernicus_temperature(date = '20200101'));
-// t4:=(t3[date,latitude,longitude SUM sea_surface_temperature]);
+// t4:=(t3[date SUM sea_surface_temperature]);
 // t5:=(t2 DUNION[src] t4)[COAL src]
 
 // t1:=(climate_temperature(date = '20200101D'));
 // t2:=([latitude,longitude SUM sea_surface_temperature,counter])
 
-t1:=(climate_temperature[latitude SUM sea_surface_temperature]);
-t2:= (copernicus_temperature[latitude SUM sea_surface_temperature]);
-t3:=(t1 DUNION[discr] t2)[COAL discr]
-
-
-
-
-      
+// t1:=((climate_temperature(date = '20200101D') JOIN (dates{id -> date})) JOIN (months{id->month}));
+// t2:=((t1(month = '202001'))[month SUM sea_surface_temperature]);
+// t3:=((copernicus_temperature(date = '20200101') JOIN (dates{id -> date})) JOIN (months{id->month}));
+// t4:=((t3(month = '202001'))[month SUM sea_surface_temperature]);
+// // [date SUM sea_surface_temperature]);
+// // t2:= (copernicus_temperature[date SUM sea_surface_temperature]);
+// t5:=(t2 DUNION[discr] t4)[COAL discr]
          """
     val conn = connector.getConnection()
-
-
     val ctx = Database.loadSchema(conn)
     var schema1: String = " "
     var enc=args(4)
     val encoding = Encoding.encoder_to_use(args.applyOrElse(4, { _: Int => "nf2_sparsev"}))
-
-    //println(ctx)
 
     // should only be called after queries are typechecked
     def getQuery(q: Absyn.Query): Database.Rel = {
@@ -41,8 +36,6 @@ t3:=(t1 DUNION[discr] t2)[COAL discr]
       val stream = Database.streamQuery(ps)
       Database.getRelation(stream, q.schema)
     }
-
-
       print("query> ")
       val str = input_text
       try {
@@ -64,8 +57,6 @@ t3:=(t1 DUNION[discr] t2)[COAL discr]
           q0vc = iq0vc
           enc_schema = EncodeNF2_SparseV.instanceSchemaEncoding(ctx)
           // print(q0)
-
-
         }
         else {
           // print("no")
@@ -75,14 +66,13 @@ t3:=(t1 DUNION[discr] t2)[COAL discr]
           enc_schema = EncodePartitioning.instanceSchemaEncoding(ctx)
           // print(q0)
         }
-        
         println("----->>>> Query encoding")
         // println(q0)
         // println(q0vc)
         // println(enc_schema)
         val schema0 = Absyn.Query.tc(enc_schema, q0)
         val schema0vc = Absyn.Query.tc(enc_schema, q0vc)
-        println("----->>>>>>> Query encoding schema")
+        println("----->>>>>>> Query encoding schema")    
         // println(schema0)
         // println(schema0vc)
         val sql0 = Absyn.Query.sql(q0)
@@ -93,21 +83,18 @@ t3:=(t1 DUNION[discr] t2)[COAL discr]
         println("========")
         println("Base result:")
         val result0 = getQuery(q0)
-        // println(result0)
+        println(result0)
         println("========")
         println("========")
         println("Base result VC:")
         val result0vc = getQuery(q0vc)
         // println(result0vc)
         println("========")
-        val (valuation,objective,eqs,vars,eqCreationTime,solveTime) = VirtualSolver.solve1(connector, q, encoding, false)
+        var boundlist: ListBuffer[Double] = ListBuffer(0,1)
+        val (valuation,objective,eqs,vars,eqCreationTime,solveTime) = VirtualSolver.solve1(connector, q, boundlist, encoding, false)
         println(s";$eqs;$vars;"+eqCreationTime+";"+solveTime+";"+objective)
       } catch {
         case Absyn.TypeError(msg) => println("Type error: " + msg)
       }
-
     }
-
-
-
 }

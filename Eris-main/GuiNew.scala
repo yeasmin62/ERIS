@@ -16,6 +16,7 @@ import scalafx.scene.layout._
 import scalafx.stage.{FileChooser, Window}
 import scalafx.stage.FileChooser
 import scala.collection.mutable.ListBuffer
+import scalafx.beans.value.ObservableValue
 import scalafx.concurrent.Task
 import scala.io.Source
 import scalafx.geometry.HPos
@@ -34,12 +35,13 @@ object GuiNew extends JFXApp {
   var flag_null: String = ""
   var flag_error: String = ""
   var encoding: Encoding = _
+  var boundlist: ListBuffer[Double] = ListBuffer()
 
   stage = new JFXApp.PrimaryStage {
     title.value = "Eris: Discord measurement prototype"
   }
 
-  scene1 = new Scene(400, 450) {
+  scene1 = new Scene(600, 450) {
 
     // var input_text: String = " "
 
@@ -62,26 +64,31 @@ object GuiNew extends JFXApp {
     // print("ctx1" + ctx1)
 
     val tabpane = new TabPane()
-    val tab1 = new Tab(){
+    val tab1 = new Tab() { // this tab is in the second position
       closable = false
-      text = "General"
-    }
-    val tab2 = new Tab(){
-      text = "Ground Truth"
-      closable = false
-      disable = true
-
-    }
-    val tab3 = new Tab(){
-      text = "Query Input"
-      closable = false
+      text = "Symbolic Representation"
       disable = true
     }
-    val tab4 = new Tab(){
-      text = "Help"
+    val tab2 = new Tab() { // this tab is in the first position
+      text = "VARFREE TABLE"
+      closable = false
+      disable = false
+
+    }
+    val tab3 = new Tab() {
+      text = "Alignment Query" // this tab is in the 4th position
+      closable = false
+      disable = true
+    }
+    val tab4 = new Tab() {
+      text = "Learn More" // this tab is in the 5th position
       closable = false
     }
-
+    val tab5 = new Tab() {
+      text = "Model Evaluation Criteria" // this tab is in the third position
+      closable = false
+      disable = true
+    }
 
     ////////// Tab 1 /////////////
     val label = new Label("Which Encoding would you prefer?")
@@ -114,7 +121,7 @@ object GuiNew extends JFXApp {
     }
     val toggol2 = new ToggleGroup
     toggol2.toggles = List(rbn3, rbn4)
-    val label2 = new Label("Do you want to consider NULL in cost function?") {}
+    val label2 = new Label("Do you want to consider null variables in cost function?") {}
     val rbn_null = new RadioButton("Yes") {
       onAction = (e: ActionEvent) => {
         flag_null = "true"
@@ -127,28 +134,30 @@ object GuiNew extends JFXApp {
     }
     val toggol3 = new ToggleGroup
     toggol3.toggles = List(rbn_null, rbn_not_null)
-    val label3 = new Label("Cost functions") {}
+    val label3 = new Label("Cost function Metrics") {}
 
-    val rbn_s_error = new RadioButton("Average Square Error (ASE)") {
+    val rbn_s_error = new RadioButton("Mean Square Error (MSE)") {
       onAction = (e: ActionEvent) => {
         flag_error = "ASE"
         print(flag_error)
       }
     }
-    val rbn_a_error = new RadioButton("Average Absolute Error (AAE)") {
+    val rbn_a_error = new RadioButton("Mean Absolute Error (MAE)") {
       onAction = (e: ActionEvent) => {
         flag_error = "AAE"
         print(flag_error)
       }
     }
-    val rbn_value_interval = new RadioButton("Error with Variable Constraints"){
+    val rbn_value_interval = new RadioButton(
+      "Error with Variable Constraints"
+    ) {
       onAction = (e: ActionEvent) => {
         flag_error = "Value_Interval"
         print(flag_error)
       }
     }
     val toggol4 = new ToggleGroup
-    toggol4.toggles = List(rbn_s_error, rbn_a_error,rbn_value_interval)
+    toggol4.toggles = List(rbn_s_error, rbn_a_error, rbn_value_interval)
 
     ////// Loading Tasks ///////
     def createLoadingTask(): Task[Unit] = Task {
@@ -166,13 +175,11 @@ object GuiNew extends JFXApp {
       Thread.sleep(10000)
     }
 
-
     val progressBar = new ProgressBar {
       // value_= (0) // set initial value to 0
       prefWidth = 200
       progress = 0
     }
-
 
     val loadingLabel = new Label("Loading...") {
       visible = false
@@ -185,27 +192,7 @@ object GuiNew extends JFXApp {
       children = Seq(loadingLabel, completed)
     }
 
-    val next1 = new Button("Next")
-    {
-      onAction = (e: ActionEvent) => {
-        var alert = new GuiAlert()
-        (enc, flagV, flag_null, flag_error) match {
-          case ("", _, _, _) => alert.showWarning("Please select encoding")
-          case (_, "", _, _) => alert.showWarning("Please select variable")
-          case (_, _, "", _) => alert.showWarning("Please select null option")
-          case (_, _, _, "") => alert.showWarning("Please select cost")
-          case (_, _, _, _) => {
-            tab2.disable = false
-            tabpane.selectionModel().select(tab2)
-
-          }
-          
-        }
-        
-      }
-    }
-
-    val loadbtn = new Button("Load") {
+    val loadbtn = new Button("Create Table Views") {
       onAction = (e: ActionEvent) => {
         var alert = new GuiAlert()
         (enc, flagV) match {
@@ -215,25 +202,24 @@ object GuiNew extends JFXApp {
             val loadingTask = createLoadingTask()
 
             loadingTask.setOnRunning { _ =>
-              progressBar2.progress = -1 // Indeterminate progress
+              progressBar.progress = -1 // Indeterminate progress
               completed.visible = false
               loadingLabel.visible = true
 
             }
 
             loadingTask.setOnSucceeded { _ =>
-              progressBar2.progress = 1 // Completed progress
+              progressBar.progress = 1 // Completed progress
               // loadingLabel.text = "Completed!!"
               loadingLabel.visible = false
               completed.visible = true
-              tab3.disable = false
-              tabpane.selectionModel().select(tab3)
+              tab5.disable = false
+              tabpane.selectionModel().select(tab5)
             }
 
             new Thread(loadingTask).start()
           }
         }
-      
 
       }
     }
@@ -323,7 +309,7 @@ object GuiNew extends JFXApp {
               // selectedMapping += (key -> (selectedMapping.getOrElse(key, "") + checkbox.text()))
             }
           }
-        }        
+        }
         checkbox
       }
       checkboxes.foreach { checkbox =>
@@ -431,7 +417,7 @@ object GuiNew extends JFXApp {
       onAction = (e: ActionEvent) => {
         // print("SM" + selectedMapping + "\n")
         // print(unselectedMapping)
-        
+
         val loadingTask = createupdatingTask()
 
         loadingTask.setOnRunning { _ =>
@@ -446,37 +432,37 @@ object GuiNew extends JFXApp {
         loadingTask.setOnSucceeded { _ =>
           progressBar2.progress = 1 // Completed progress
           // loadingLabel.text = "Completed!!"
-          
+
           loadingLabel2.text = "Updating Complete!!"
-          // completed2.visible = true
-          
+          tab1.disable = false
+          tabpane.selectionModel().select(tab1)
+        // completed2.visible = true
+
         }
 
         new Thread(loadingTask).start()
-        
+
       }
     }
-    Tooltip.install(up_schema, new Tooltip("First Update schema, then Refresh Loading"))
+    // Tooltip.install(up_schema, new Tooltip("First Update schema, then Refresh Loading"))
     var (loadingLabel3, completed3) = new EquationConversion().LabelCompleted()
 
-    val refreshbutton = new Button("Load")
-    {
+    val refreshbutton = new Button("Load") {
       onAction = (e: ActionEvent) => {
-      ctx1 = Database.loadSchema(conn)
-       var alert = new GuiAlert()
+        ctx1 = Database.loadSchema(conn)
+        var alert = new GuiAlert()
         (enc, flagV) match {
           case ("", _) => alert.showWarning("Please select encoding")
           case (_, "") => alert.showWarning("Please select variable")
           case (_, _) => {
             val loadingTask = createLoadingTask()
-            
 
             loadingTask.setOnRunning { _ =>
               progressBar2.progress = -1 // Indeterminate progress
               loadingLabel2.visible = false
               loadingLabel3.visible = true
               loadingLabel3.text = "Loading..."
-              // completed3.visible = false
+            // completed3.visible = false
 
             }
 
@@ -495,18 +481,18 @@ object GuiNew extends JFXApp {
       }
 
     }
-    Tooltip.install(refreshbutton, new Tooltip("First Update schema, then Refresh Loading"))
+    // Tooltip.install(refreshbutton, new Tooltip("First Update schema, then Refresh Loading"))
 
     ////////// Tab 2 /////////////
- 
+
     val hnewbox = new HBox() {
       spacing = 20
-      children = Seq(loadingLabel2,loadingLabel3)
+      children = Seq(loadingLabel2, loadingLabel3)
     }
 
-       val hnewbox1 = new HBox() {
+    val hnewbox1 = new HBox() {
       spacing = 20
-      children = Seq(up_schema, refreshbutton)
+      children = Seq(up_schema)
     }
 
     // hnewbox.children.add(up_schema)
@@ -532,7 +518,9 @@ object GuiNew extends JFXApp {
         val selectedfile = filechooser.showOpenDialog(stage)
         if (selectedfile != null) {
           val source = scala.io.Source.fromFile(selectedfile)
-          val fileContent = try source.getLines.mkString("\n") finally source.close()
+          val fileContent =
+            try source.getLines.mkString("\n")
+            finally source.close()
           InputArea.text = fileContent
         }
         input_text = selectedfile.toString()
@@ -546,50 +534,51 @@ object GuiNew extends JFXApp {
     val rbn5 = new Button("RUN") {
       layoutX = 210
       layoutY = 490
-      
+      disable = false
+
       onAction = (e: ActionEvent) => {
 
-        try{
-        ctx1 = Database.loadSchema(conn) // keeps all the key values
-        var alert = new GuiAlert()
-        (enc, flagV, flag_null, flag_error, input_text) match {
-          case ("", _, _, _, _) => alert.showWarning("Please select encoding")
-          case (_, "", _, _, _) => alert.showWarning("Please select variable")
-          case (_, _, "", _, _) =>
-            alert.showWarning("Please select NULL options")
-          case (_, _, _, "", _) =>
-            alert.showWarning("Please select Cost Function")
-          case (_, _, _, _, "") => alert.showWarning("Please insert input")
-          case (_, _, _, _, _) => {
-            val result = alert.showalert()
-            if (result == ButtonType.Yes) {
-              stage.scene = GuiScene2.createScene(
-                connector,
-                input_text,
-                ctx1,
-                enc,
-                encoding,
-                flag_error,
-                flag_null.toBoolean,
-                () => stage.setScene(scene1)
-              )
-              stage.show()
-              // stage.close()
-              // stage.scene = scene1
+        try {
+          ctx1 = Database.loadSchema(conn) // keeps all the key values
+          var alert = new GuiAlert()
+          (enc, flagV, flag_null, flag_error, input_text) match {
+            case ("", _, _, _, _) => alert.showWarning("Please select encoding")
+            case (_, "", _, _, _) => alert.showWarning("Please select variable")
+            case (_, _, "", _, _) =>
+              alert.showWarning("Please select NULL options")
+            case (_, _, _, "", _) =>
+              alert.showWarning("Please select Cost Function")
+            case (_, _, _, _, "") => alert.showWarning("Please insert input")
+            case (_, _, _, _, _) => {
+              val result = alert.showalert()
+              if (result == ButtonType.Yes) {
+                stage.scene = GuiScene2.createScene(
+                  connector,
+                  input_text,
+                  boundlist,
+                  ctx1,
+                  enc,
+                  encoding,
+                  flag_error,
+                  flag_null.toBoolean,
+                  () => stage.setScene(scene1)
+                )
+                stage.show()
+                // stage.close()
+                // stage.scene = scene1
+              }
             }
           }
+        } catch {
+          case Absyn.TypeError(msg) =>
+            val errorAlert = new GuiAlert()
+            errorAlert.showWarning("\nType error: " + msg)
+            println("\nType error: " + msg)
+          case VirtualSolver.DataProcessingException(msg) =>
+            val errorAlert = new GuiAlert()
+            errorAlert.showWarning(msg)
         }
-      }
-      catch{
-        case Absyn.TypeError(msg) => 
-          val errorAlert = new GuiAlert()
-          errorAlert.showWarning("\nType error: " + msg)
-          println("\nType error: " + msg)
-        case VirtualSolver.DataProcessingException(msg) =>
-          val errorAlert = new GuiAlert()
-          errorAlert.showWarning(msg)
-      }
-        
+
       }
     }
     val rbn6 = new Button("EXIT") {
@@ -615,18 +604,10 @@ object GuiNew extends JFXApp {
       label1,
       rbn3,
       rbn4,
-      new Pane { prefHeight = 10 },
-      label2,
-      rbn_null,
-      rbn_not_null,
-      new Pane { prefHeight = 10 },
-      label3,
-      rbn_s_error,
-      rbn_a_error,
-      rbn_value_interval,
-      new Pane { prefHeight = 10 },
+      new Pane { prefHeight = 50 },
+      progressBar,
       tab1hbox,
-      next1
+      loadbtn
     )
 
     ////////// Tab 2 /////////////
@@ -646,27 +627,127 @@ object GuiNew extends JFXApp {
 
     val tab3hbox2 = new HBox() {
       spacing = 10
+      // alignment = Center
+    }
+    val varlbl = new Label("Bound for the variables")
+    // Listener for textfield changes
+    // Listener for textfield changes
+  val highlightStyle = "-fx-border-color: red; -fx-border-width: 2; -fx-background-color: lightgray;"
+
+    val Lowerbnd = new TextField {
+      promptText = "Lower Bound"
+    }
+    val Upperbnd = new TextField {
+      promptText = "Upper Bound"
+    }
+    Lowerbnd.text.onChange(textFieldListener)
+    Upperbnd.text.onChange(textFieldListener)
+    
+
+    lazy val boundbtn = new Button("Insert Bounds") {
+      disable = true
+      onAction = (e: ActionEvent) => {
+        style = ""
+        // Converting the text values into double values
+        val lbnd = Lowerbnd.text.value
+        val ubnd = Upperbnd.text.value
+        val (bndlist, statusbnd) = new GuiAlert().processBounds(lbnd, ubnd, boundlist)
+        boundlist = bndlist
+        if (boundlist.isEmpty) {
+          print("Invalid Lower and Upper Bound")
+        } else {
+          print("Lower Bound " + boundlist(0))
+          print("Upper Bound " + boundlist(1))
+        }
+        if(statusbnd){
+          next1.disable = false
+        }
+        else{
+          next1.disable = true
+        }
+        
+
+      }
+    }
+    tab3hbox2.children = List(varlbl, Lowerbnd, Upperbnd, boundbtn)
+    val tab3hbox3 = new HBox() {
+      spacing = 10
       alignment = Center
     }
-    tab3hbox2.children = List(rbn5, rbn6)
+    tab3hbox3.children = List(rbn5, rbn6)
 
     var tab3vbox = new VBox() {
       spacing = 10
       // padding = Insets(10)
     }
-    tab3vbox.children =
-      List(new Pane { prefHeight = 10 }, tab3hbox, tab3hbox1, tab3hbox2)
+    tab3vbox.children = List(
+      new Pane { prefHeight = 10 },
+      tab3hbox,
+      tab3hbox1,
+      tab3hbox3
+    )
 
     //// Tab 4 /////
     val tab4scroll = GuiTabFour.tabfour()
 
+    //// Tab 5 ////
+    var next1 = new Button("Next") {
+      disable = true
+      onAction = (e: ActionEvent) => {
+        var alert = new GuiAlert()
+        (flag_null, flag_error) match {
+          case ("", _) => alert.showWarning("Please select null option")
+          case (_, "") => alert.showWarning("Please select cost function")
+          case (_, _) => {
+          tab3.disable = false
+          tabpane.selectionModel().select(tab3)
+          }
+      }
+    }
+  }
+    lazy val textFieldListener = (observable: ObservableValue[String, String], oldValue: String, newValue: String) => {
+    boundbtn.disable = false
+    boundbtn.style = highlightStyle
+    next1.disable = true
+  }
+    var tab5vbox = new VBox() {
+      padding = geometry.Insets(0, 0, 0, 40)
+      // spacing = 10
+      children = List(new Pane { prefHeight = 30 },
+      label2,
+      rbn_null,
+      rbn_not_null,
+      new Pane { prefHeight = 10 },
+      label3,
+      rbn_s_error,
+      rbn_a_error,
+      rbn_value_interval,
+      new Pane { prefHeight = 10 },
+      tab3hbox2,
+      new Pane { prefHeight = 40 },
+      next1)
+    }
 
     ///////// TABPANE/////////
     tab1.content = tab1vbox
     tab2.content = tab2scroll
     tab3.content = tab3vbox
     tab4.content = tab4scroll
-    tabpane.tabs = List(tab1, tab2, tab3, tab4)
+    tab5.content = tab5vbox
+    tabpane.tabs = List(tab2, tab1, tab5, tab3, tab4)
+
+    // Listener for tab selection changes
+    tabpane.selectionModel().selectedItem.onChange { (_, _, newTab) =>
+      if (tabpane.tabs.indexOf(newTab) < tabpane.tabs.size - 2) {
+        // Disable all tabs following the currently selected tab
+        for (
+          i <- tabpane.tabs.indexOf(newTab) + 1 until tabpane.tabs.size - 1
+        ) {
+          tabpane.tabs(i).disable = true
+        }
+      }
+    }
+
     root = tabpane
   }
 

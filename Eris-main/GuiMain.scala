@@ -1,3 +1,4 @@
+import scala.collection.mutable.ListBuffer
 object GuiMain {
 
   val p = new RAParser()
@@ -10,10 +11,11 @@ object GuiMain {
     Database.getRelation(stream, q.schema)
   }
 
-/// to print the queries or equations
+/// to pro the queries or equations
   def queryprint(
       connector: Connector,
       specfile: String,
+      boundlist: ListBuffer[Double],
       ctx: Database.InstanceSchema,
       enc:String,
       encoding: Encoding
@@ -73,6 +75,7 @@ object GuiMain {
   def costprint(
       connector: Connector,
       specfile: String,
+      boundlist: ListBuffer[Double],
       ctx: Database.InstanceSchema,
       encoding: Encoding,
       flag_error:String,
@@ -80,7 +83,7 @@ object GuiMain {
   ): Any = {
     val str = specfile
     val (valuation, objective, eqs, vars, eqCreationTime, solveTime) =
-      SolveView.view(connector, str, encoding, Map("#" + 1-> "20200101", "#" + 2-> "20200101"), flag_error, flag_null)
+      SolveView.view(connector, str, boundlist, encoding, Map("#" + 1-> "20200101", "#" + 2-> "20200101"), flag_error, flag_null)
     (valuation, objective, eqs, vars, eqCreationTime, solveTime)
   }
 

@@ -5,6 +5,9 @@ import pandas as pd
 from sqlalchemy import create_engine
 import numpy as np
 from time import time
+import constraints_of_facts
+import analyze_table
+import psycopg2
 
 def generate_keys(lat,lon):
     # Handle rounding differently for positive and negative values
@@ -20,10 +23,16 @@ def generate_keys(lat,lon):
 
 def process_file(args):
     filename, path_cd, index_cd, points, dict, connection_string = args
-    date = filename.split('.')[1]  # extract date from filename
+    file_split = filename.split('.')
+    d = file_split[1]  # extract date from filename
     nc = nc4.Dataset(os.path.join(path_cd, filename))
-    sst4 = nc['sst4'][:]
-
+    # print(nc.variables)
+    if 'SST' in file_split:
+        date = d + 'D'
+        sst4 = nc['sst'][:]
+    elif 'SST4' in file_split:
+        date = d + 'N'
+        sst4 = nc['sst4'][:]
     data_list = []
     for pos,p in zip(index_cd,points):
         k1,k2 = generate_keys(p[0],p[1])
@@ -60,8 +69,8 @@ def load_modisaqua(connection_info):
     point_lat = pd.read_csv(r'Dimensioncsv/medi_lat.csv')
     point_lon = pd.read_csv(r'Dimensioncsv/medi_lon.csv')
 
-    points_lat = point_lat['lat'][:1].to_numpy()
-    points_lon = point_lon['lon'][:1].to_numpy()
+    points_lat = point_lat['lat'][:5].to_numpy()
+    points_lon = point_lon['lon'][:5].to_numpy()
 
     # Create a grid of points
     grid_lat, grid_lon = np.meshgrid(points_lat, points_lon)
@@ -89,3 +98,39 @@ def load_modisaqua(connection_info):
     end_time = time()
 
     return end_time - start_time
+
+def database_connection(config_file_name):
+    ''' This Function will connect to the database'''
+    with open('config.txt', 'r') as file:
+        connection_info = {}
+        for line in file:
+            key, value = line.strip().split('=')
+            connection_info[key] = value
+
+    conn = psycopg2.connect(
+        database=connection_info['database'],
+        user=connection_info['user'],
+        password=connection_info['password'],
+        host=connection_info['host'],
+        port=connection_info['port']
+    )
+
+    conn.autocommit = True
+    cursor = conn.cursor()
+
+    return conn,cursor, connection_info
+if __name__ == "__main__":
+
+    st = time()
+    conn,cursor, connection_info = database_connection(config_file_name='config.txt')
+    print('Loading data into modisaqua table\n')
+    run_time_path = load_modisaqua(connection_info)
+    print(f"Time to insert into modisaqua = {run_time_path}s")
+    
+    # calling fact tables constraints function 
+    constraints_of_facts.fact_constraints(cursor)
+
+    # calling the analyze fact tables function
+    analyze_table.analyze_fact_tables(connection_info)
+    
+    conn.close()

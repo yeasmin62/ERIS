@@ -1,3 +1,4 @@
+import scala.collection.mutable.ListBuffer
 object SolveAll {
 
   import Timer.timeIt
@@ -81,7 +82,10 @@ object SolveAll {
         var objective = 0.0
         for (i <- Range(0,numRuns)) {
           val flag_null = true
-          val ((_,o,eqs,vars,eqCreationTime,solveTime),totalTime) = Timer.timeIt(VirtualSolver.solve(connector, q, encoding,flag_null))
+          var vlist:Map[String, String] = Map()
+          val boundlist: ListBuffer[Double] = ListBuffer()
+          val aq = SolveView.view1(connector, q, encoding, vlist) 
+          val ((_,o,eqs,vars,eqCreationTime,solveTime),totalTime) = Timer.timeIt(VirtualSolver.solve1(connector, aq,boundlist, encoding,flag_null))
           runningEqCreationTime += eqCreationTime/1e6
           runningSolveTime += solveTime/1e6
           runningTotalTime += totalTime/1e6
